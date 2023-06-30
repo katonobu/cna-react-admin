@@ -1,9 +1,50 @@
-import { Datagrid, List, TextField, NumberField} from 'react-admin';
+import { Datagrid, List, TextField, Button, TopToolbar, ExportButton} from 'react-admin';
+import { useCreate} from 'react-admin';
+import AddIcon from '@mui/icons-material/Add';
+import { Box, Typography } from '@mui/material';
+import {useEffect} from 'react'
+
+const AttachButton = () => {
+    const [create, { isLoading }] = useCreate('webserialport', {});
+    return (
+        <Button label="Select/Add" onClick={() => create()} disabled={isLoading}>
+            <AddIcon/>
+        </Button>
+    );
+}
+
+const ListActions = () => (
+    <TopToolbar>
+        <AttachButton/>
+        <ExportButton/>
+    </TopToolbar>    
+)
+
+const Empty = () => {
+    const [create, { isLoading }] = useCreate('webserialport', {});
+    useEffect(()=>{create()},[create]);
+    return (
+        <Box textAlign="center" m={1}>
+            <Typography variant="h4" paragraph>
+                No registrated serialport available
+            </Typography>
+            <Typography variant="body1">
+                Select / Registrate one 
+            </Typography>
+            <AttachButton />
+        </Box>
+    )
+}
 
 export const SerialPortsList = () => {
     return (
-        <List>
-            <Datagrid rowClick={(id) =>id==="0"?'create':'edit'}>
+        <List
+            empty={<Empty />}        
+            actions={<ListActions/>}
+        >
+            <Datagrid
+                rowClick='edit'
+            >
                 <TextField source="id" />
                 <TextField source="vid" />
                 <TextField source="venderName" />
@@ -14,6 +55,17 @@ export const SerialPortsList = () => {
     )
 };
 /*
+        <CreateButton/>
+
+import * as React from 'react';
+import { useUpdate, useRecordContext, Button } from 'react-admin';
+
+const ApproveButton = () => {
+    const record = useRecordContext();
+    const [approve, { isLoading }] = useUpdate('comments', { id: record.id, data: { isApproved: true }, previousData: record });
+    return <Button label="Approve" onClick={() => approve()} disabled={isLoading} />;
+};
+
                 <TextField source="rx" />
                 <TextField source="errorStr" />
                 <TextField source="dataCarrierDetect" />

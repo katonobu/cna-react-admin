@@ -395,7 +395,7 @@ export default (() => {
   }
 
   let portObjs: WebSerialPort[] = [];
-  addWebSerialStore(null);
+//  addWebSerialStore(null);
   navigator.serial
     .getPorts()
     .then((ports) =>{
