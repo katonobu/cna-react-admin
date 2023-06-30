@@ -1,10 +1,10 @@
 import { AuthProvider } from "react-admin";
 
-const authProvider = (tb_base_url:string) => {
+const authProvider = (base_url:string) => {
     return {
         // send username and password to the auth server and get back credentials
         login: ({ username, password}:{username:string, password:string}) => {
-            return fetch(tb_base_url + "/api/auth/login", {
+            return fetch(base_url + "/api/auth/login", {
                 method: "POST",
                 headers: {
                   "accept": "application/json",
@@ -35,7 +35,7 @@ const authProvider = (tb_base_url:string) => {
             return Promise.resolve();
             /*
             if(localStorage.getItem('username')) {
-                return fetch(tb_base_url+ "/api/auth/logout", {
+                return fetch(base_url+ "/api/auth/logout", {
                     method: "POST",
                     headers: {
                         "accept": "application/json",
@@ -74,7 +74,7 @@ const authProvider = (tb_base_url:string) => {
     //        return Promise.resolve({id:"123",fullName:"Nobuo Kato"})
             if(localStorage.getItem('username')) {
     //            console.log("getIdentity", localStorage.getItem('token'))
-                return fetch(tb_base_url+ "/api/auth/user", {
+                return fetch(base_url+ "/api/auth/user", {
                     method: "GET",
                     headers: {
                         "accept": "application/json",
