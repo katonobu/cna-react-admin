@@ -4,8 +4,10 @@
     - TB認証は通るが、データアクセスしてない
   - シリアル
     - シリアルページでも認証が求められる。
-    - シリアルデバイスの挿抜でデータは増減するが、画面に反映しない。
-      - subscribe&描画更新の方法確認必要。
+      - [Permissions](https://marmelab.com/react-admin/Permissions.html)にかかれてそう
+      - むつかしいかも、、、
+    - DeleteしてEmptyになったとき、Deleteの完了後の状態更新を待たずにrequestPort()を呼び出してるので、ポート選択画面で登録済み状態と表示される。
+      - Empty()への遷移をDeleteの完了後の状態更新を待ってからに遅延させられないか
 
 - 今後の機能追加予定
   - ネット接続
@@ -30,3 +32,13 @@
     ```  
     - navigator要素を参照している個所(app/webSerialDataProvider/src/webSerialPorts.ts)を`if (typeof window !== 'undefined') {`で括った。
 
+  - buildでエラーとなる
+    - dataProvideの各メソッドの戻り値の型は、react-admin で `メソッド名Result`として定義されてるっぽい。
+      - 戻り値を `as xxxResult` とキャストした。
+    - navigator is not defined と言われる。
+      - navigator要素を参照している個所(app/webSerialDataProvider/src/webSerialPorts.ts)を`if (typeof window !== 'undefined') {`で括った。
+
+  - シリアルデバイスの挿抜でデータは増減するが、画面に反映しない。
+    - useRefresh() で画面強制更新できる。
+    - useEffect() でマウント時/案マウント時にuseRefreshの戻り値をwebSerialPortにsubscribeさせる。
+    

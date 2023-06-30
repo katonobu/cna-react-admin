@@ -15,7 +15,7 @@ const webSerialProvider = (): DataProvider => {
         }
     };
     const serializeWebSerialPort = (wsp:any):Object => {
-        console.log(wsp);
+//        console.log(wsp);
         return {
             id:wsp.idStr,
             venderName:wsp.venderName,

@@ -1,8 +1,9 @@
 import { Datagrid, List, TextField, Button, TopToolbar, ExportButton} from 'react-admin';
-import { useCreate} from 'react-admin';
+import { useCreate, useRefresh} from 'react-admin';
 import AddIcon from '@mui/icons-material/Add';
 import { Box, Typography } from '@mui/material';
-import {useEffect} from 'react'
+import {useEffect, useCallback, useState} from 'react'
+import webSerialPorts from '../../webSerialDataProvider/src/webSerialPorts'
 
 const AttachButton = () => {
     const [create, { isLoading }] = useCreate('webserialport', {});
@@ -37,6 +38,40 @@ const Empty = () => {
 }
 
 export const SerialPortsList = () => {
+    const refresh = useRefresh();
+    useEffect(()=>{
+        const unsubscribe = webSerialPorts.subscribe(refresh)
+        return (()=>{
+            console.log("Unsubscribe")
+            unsubscribe();
+        })
+    },[refresh])
+    /*
+    const [serialPortsStt, setSerialPortsStt] = useState([])
+    const updateSerialPortsList = useCallback(()=>{
+        setSerialPortsStt((prevStt:{id:string,openUnsub:()=>boolean}[])=>{
+            const newStt = webSerialPorts.getPorts().map((port)=>({id:port.idStr}))
+            const appendeds = newStt.filter((port)=>prevStt.find((pp)=>pp.id === port.id)?false:true)
+            // appendedsの要素をsubscribe
+            const withUnsubscribe = appendeds.map((port)=>({...port, openUnsub:webSerialPorts.getPortById(port.id)?.subscribeIsOpen(refresh)}))
+            const removeds = prevStt.filter((port)=>newStt.find((np)=>np.id === port.id)?false:true)
+            removeds.forEach((port)=>port.openUnsub())
+            // removedsの要素をunsubscribe
+            console.log("append:", withUnsubscribe)
+            console.log("remove:", removeds)
+            return [...withUnsubscribe]
+        })
+        refresh()
+    },[refresh])
+    useEffect(()=>{
+        updateSerialPortsList()
+        const unsubscribe = webSerialPorts.subscribe(updateSerialPortsList)
+        return (()=>{
+            unsubscribe();
+        })
+    },[updateSerialPortsList])
+    */
+
     return (
         <List
             empty={<Empty />}        

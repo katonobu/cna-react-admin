@@ -30,8 +30,6 @@ const tbAuthProvider = authProvider("https://demo.thingsboard.io:443")
 const App = () => (
   <Admin
     dataProvider={dataProvider}
-    authProvider={tbAuthProvider}
-    requireAuth  
   >
     <Resource name="users" list={ListGuesser} edit={EditGuesser} recordRepresentation="name" />
     <Resource name="posts" list={ListGuesser} edit={EditGuesser} recordRepresentation="title" />
@@ -39,5 +37,6 @@ const App = () => (
     <Resource name="webserialport" {...serialPorts} />
   </Admin>
 );
+/*     authProvider={tbAuthProvider} */
 
 export default App;
