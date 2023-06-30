@@ -404,12 +404,12 @@ export default (() => {
 
   const create = async (
     requestPortFilters: SerialPortRequestOptions
-  ): Promise<WebSerialPort | null> => {
+  ): Promise<WebSerialPort> => {
     try {
       const port:SerialPort = await navigator.serial.requestPort(requestPortFilters);
       return addWebSerialStore(port);
     } catch (e) {
-      return null;
+      throw e
     }
   };
   navigator.serial.addEventListener('connect', (event: Event) =>{

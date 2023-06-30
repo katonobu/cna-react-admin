@@ -19,66 +19,53 @@ const webSerialProvider = (apiUrl:string, httpClient = fetchUtils.fetchJson): Da
     const serializeWebSerialPort = (wsp):Object => {
         console.log(wsp);
         return {
-          id:wsp.idStr,
-          venderName:wsp.venderName,
-          pid:'0x'+('0000'+wsp.pid.toString(16)).slice(-4),
-          vid:'0x'+('0000'+wsp.vid.toString(16)).slice(-4),
-          isOpen:wsp.isOpen?'Open':'Close',
-/*
-          dataCarrierDetect:trueFalseNullToString(wsp.signals.dataCarrierDetect),
-          clearToSend:trueFalseNullToString(wsp.signals.clearToSend),
-          ringIndicator:trueFalseNullToString(wsp.signals.ringIndicator),
-          dataSetReady:trueFalseNullToString(wsp.signals.dataSetReady),
-          dataTerminalReady:trueFalseNullToString(wsp.signals.dataTerminalReady),
-          requestToSend:trueFalseNullToString(wsp.signals.requestToSend),
-          errorStr:wsp.errorStr,
-          rx:wsp.rx,
-*/
+            id:wsp.idStr,
+            venderName:wsp.venderName,
+            pid:'0x'+('0000'+wsp.pid.toString(16)).slice(-4),
+            vid:'0x'+('0000'+wsp.vid.toString(16)).slice(-4),
+            isOpen:wsp.isOpen?'Open':'Close',
+    /*
+            dataCarrierDetect:trueFalseNullToString(wsp.signals.dataCarrierDetect),
+            clearToSend:trueFalseNullToString(wsp.signals.clearToSend),
+            ringIndicator:trueFalseNullToString(wsp.signals.ringIndicator),
+            dataSetReady:trueFalseNullToString(wsp.signals.dataSetReady),
+            dataTerminalReady:trueFalseNullToString(wsp.signals.dataTerminalReady),
+            requestToSend:trueFalseNullToString(wsp.signals.requestToSend),
+            errorStr:wsp.errorStr,
+            rx:wsp.rx,
+    */
         }
     };
   
     return {
         getList: (resource, params) => {
-            try {
-                const wsps = webSerialPorts.getPorts()
-                return Promise.resolve({
-                    data:wsps.map((wsp)=>serializeWebSerialPort(wsp) as RecordType),
-                    total:wsps.length
-                });
-            } catch (e) {
-                return Promise.reject(e)
-            }
+            const wsps = webSerialPorts.getPorts()
+            return Promise.resolve({
+                data:wsps.map((wsp)=>serializeWebSerialPort(wsp) as RecordType),
+                total:wsps.length
+            });
         },
 
         getOne: (resource, params) =>{
-            try {
-                const wsp = webSerialPorts.getPortById(params.id)
-                if (wsp) {
-                    return Promise.resolve({
-                        data:serializeWebSerialPort(wsp) as RecordType,
-                    });
-                } else {
-                    throw new Error(`${params.id} is not found`)
-                }
-            } catch (e) {
-                return Promise.reject(e)
+            const wsp = webSerialPorts.getPortById(params.id)
+            if (wsp) {
+                return Promise.resolve({
+                    data:serializeWebSerialPort(wsp) as RecordType,
+                });
+            } else {
+                return Promise.reject(new Error(`${params.id} is not found`))
             }
         },
 
         getMany: (resource, params) => {
-            try{
-                const foundPorts = params.ids.filter((id)=>webSerialPorts.getPortById(id))
-                return Promise.resolve({
-                    data:foundPorts.map((wsp)=>serializeWebSerialPort(wsp) as RecordType)
-                })
-
-            } catch (e) {
-                return Promise.reject(e)
-            } 
+            const foundPorts = params.ids.filter((id)=>webSerialPorts.getPortById(id))
+            return Promise.resolve({
+                data:foundPorts.map((wsp)=>serializeWebSerialPort(wsp) as RecordType)
+            })
         },
 
         getManyReference: (resource, params) => {
-            throw new Error('getManyReference() is not implemented yet');
+            return Promise.reject(new Error('getManyReference() is not implemented yet'))
             return Promise.resolve({data:[] as RecordType[], total:0} );
         },
 
@@ -91,12 +78,12 @@ const webSerialProvider = (apiUrl:string, httpClient = fetchUtils.fetchJson): Da
                     data:serializeWebSerialPort(wsp) as RecordType,
                 });
             } else {
-                throw new Error(`${params.id} is not found`)
+                return Promise.reject(new Error(`${params.id} is not found`))
             }
         },
 
         updateMany: (resource, params) =>{
-            throw new Error('updateMany() is not implemented yet');
+            return Promise.reject(new Error('updateMany() is not implemented yet'));
             return Promise.all(
                 params.ids.map(id => {
                     const port = webSerialPorts.getPortById(id);
@@ -111,9 +98,18 @@ const webSerialProvider = (apiUrl:string, httpClient = fetchUtils.fetchJson): Da
         },
 
         create: (resource, params) => {
-            return webSerialPorts.create({}).then((wsp)=>{
-                const retVal = {data:serializeWebSerialPort(wsp) as RecordType}
-                return retVal
+            return webSerialPorts.create({}).then((wsp)=> {
+                return {data:serializeWebSerialPort(wsp) as RecordType}
+            }).catch((e)=>{
+                if (
+                    e.code === 8 || // Failed to execute 'requestPort' on 'Serial': No port selected by the user.
+                    e.code === 18   // Failed to execute 'requestPort' on 'Serial': Must be handling a user gesture to show a permission request.
+                ){
+//                    return {data:{} as RecordType} // これだとエラーになるのでrejctedPromiseを返す。
+                    return Promise.reject(e)
+                } else {
+                    return Promise.reject(e)
+                }
             })
         },
 
@@ -123,13 +119,13 @@ const webSerialProvider = (apiUrl:string, httpClient = fetchUtils.fetchJson): Da
                 const tmp = serializeWebSerialPort(wsp);
                 return wsp.forget().then((err)=>{
                     if (err) {
-                        throw new Error(err)
+                        return Promise.reject(new Error(err))
                     }else{
                         return {data:tmp as RecordType}
                     }
                 });
             } else {
-                throw new Error('Cant find object by id')
+                return Promise.reject(new Error('Cant find object by id'))
             }
         },
 
@@ -144,6 +140,7 @@ const webSerialProvider = (apiUrl:string, httpClient = fetchUtils.fetchJson): Da
                     }
                 })
             ).then(()=>({data:params.ids}))
+            .catch((e)=>(Promise.reject(e)))
         }
     }
 };
