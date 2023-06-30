@@ -1,11 +1,9 @@
-import { stringify } from 'query-string';
-import { fetchUtils, DataProvider } from 'ra-core';
-import { RecordType } from 'ra-core';
-
-
+import { DataProvider } from 'ra-core';
+import { CreateResult, DeleteResult, DeleteManyResult, GetListResult, GetManyReferenceResult, GetManyResult, GetOneResult, UpdateManyResult, UpdateResult } from 'react-admin';
+    
 import webSerialPorts from './webSerialPorts';
 
-const webSerialProvider = (apiUrl:string, httpClient = fetchUtils.fetchJson): DataProvider => {
+const webSerialProvider = (): DataProvider => {
     console.log("webSerialProvider init.")
     const trueFalseNullToString = (obj:boolean | undefined | null):string => {
         if (obj === true) {
@@ -16,7 +14,7 @@ const webSerialProvider = (apiUrl:string, httpClient = fetchUtils.fetchJson): Da
             return 'N.A.'
         }
     };
-    const serializeWebSerialPort = (wsp):Object => {
+    const serializeWebSerialPort = (wsp:any):Object => {
         console.log(wsp);
         return {
             id:wsp.idStr,
@@ -41,17 +39,17 @@ const webSerialProvider = (apiUrl:string, httpClient = fetchUtils.fetchJson): Da
         getList: (resource, params) => {
             const wsps = webSerialPorts.getPorts()
             return Promise.resolve({
-                data:wsps.map((wsp)=>serializeWebSerialPort(wsp) as RecordType),
+                data:wsps.map((wsp)=>serializeWebSerialPort(wsp)),
                 total:wsps.length
-            });
+            } as GetListResult);
         },
 
         getOne: (resource, params) =>{
             const wsp = webSerialPorts.getPortById(params.id)
             if (wsp) {
                 return Promise.resolve({
-                    data:serializeWebSerialPort(wsp) as RecordType,
-                });
+                    data:serializeWebSerialPort(wsp),
+                } as GetOneResult);
             } else {
                 return Promise.reject(new Error(`${params.id} is not found`))
             }
@@ -60,13 +58,13 @@ const webSerialProvider = (apiUrl:string, httpClient = fetchUtils.fetchJson): Da
         getMany: (resource, params) => {
             const foundPorts = params.ids.filter((id)=>webSerialPorts.getPortById(id))
             return Promise.resolve({
-                data:foundPorts.map((wsp)=>serializeWebSerialPort(wsp) as RecordType)
-            })
+                data:foundPorts.map((wsp)=>serializeWebSerialPort(wsp))
+            } as GetManyResult)
         },
 
         getManyReference: (resource, params) => {
             return Promise.reject(new Error('getManyReference() is not implemented yet'))
-            return Promise.resolve({data:[] as RecordType[], total:0} );
+            return Promise.resolve({data:[], total:0} as GetManyReferenceResult);
         },
 
         update: (resource, params) => {
@@ -75,8 +73,8 @@ const webSerialProvider = (apiUrl:string, httpClient = fetchUtils.fetchJson): Da
             if (wsp) {
                 // 本当はここでupdateに相当する処理をする
                 return Promise.resolve({
-                    data:serializeWebSerialPort(wsp) as RecordType,
-                });
+                    data:serializeWebSerialPort(wsp),
+                } as UpdateResult);
             } else {
                 return Promise.reject(new Error(`${params.id} is not found`))
             }
@@ -94,12 +92,12 @@ const webSerialProvider = (apiUrl:string, httpClient = fetchUtils.fetchJson): Da
                         return Promise.resolve()
                     }
                 })
-            ).then(()=>({data:params.ids}))
+            ).then(()=>({data:params.ids} as UpdateManyResult))
         },
 
         create: (resource, params) => {
             return webSerialPorts.create({}).then((wsp)=> {
-                return {data:serializeWebSerialPort(wsp) as RecordType}
+                return {data:serializeWebSerialPort(wsp)} as CreateResult
             }).catch((e)=>{
                 if (
                     e.code === 8 || // Failed to execute 'requestPort' on 'Serial': No port selected by the user.
@@ -121,7 +119,7 @@ const webSerialProvider = (apiUrl:string, httpClient = fetchUtils.fetchJson): Da
                     if (err) {
                         return Promise.reject(new Error(err))
                     }else{
-                        return {data:tmp as RecordType}
+                        return {data:tmp} as DeleteResult
                     }
                 });
             } else {
@@ -139,7 +137,7 @@ const webSerialProvider = (apiUrl:string, httpClient = fetchUtils.fetchJson): Da
                         return Promise.resolve()
                     }
                 })
-            ).then(()=>({data:params.ids}))
+            ).then(()=>({data:params.ids} as DeleteManyResult))
             .catch((e)=>(Promise.reject(e)))
         }
     }

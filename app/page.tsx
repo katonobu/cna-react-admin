@@ -1,13 +1,18 @@
 // in app/page.tsx
 "use client";
-import { combineDataProviders, Admin, Resource, ListGuesser, EditGuesser } from "react-admin";
+import dynamic from 'next/dynamic'
+import { combineDataProviders, Resource, ListGuesser, EditGuesser } from "react-admin";
 import serialPorts from "./serialPorts/src/"
 import jsonServerProvider from "ra-data-json-server";
 import webSerialProvider from "./webSerialDataProvider/src";
 import authProvider from "./authProvider"
 
+const Admin = dynamic(() => import('react-admin').then((module)=>module.Admin), {
+  ssr: false, // サーバーサイドレンダリングを無効化
+});
+
 const jsonDataProvider = jsonServerProvider("https://jsonplaceholder.typicode.com");
-const serialDataProvider = webSerialProvider("https://jsonplaceholder.typicode.com");
+const serialDataProvider = webSerialProvider();
 const dataProvider = combineDataProviders((resource) => {
   switch (resource) {
       case 'users':
@@ -20,12 +25,12 @@ const dataProvider = combineDataProviders((resource) => {
           throw new Error(`Unknown resource: ${resource}`);
   }
 });
-
+const tbAuthProvider = authProvider("https://demo.thingsboard.io:443")
 
 const App = () => (
   <Admin
     dataProvider={dataProvider}
-    authProvider={authProvider}
+    authProvider={tbAuthProvider}
     requireAuth  
   >
     <Resource name="users" list={ListGuesser} edit={EditGuesser} recordRepresentation="name" />

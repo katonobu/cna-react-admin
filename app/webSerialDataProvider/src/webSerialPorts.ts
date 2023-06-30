@@ -395,39 +395,44 @@ export default (() => {
   }
 
   let portObjs: WebSerialPort[] = [];
-//  addWebSerialStore(null);
-  navigator.serial
-    .getPorts()
-    .then((ports) =>{
-      ports.forEach((port:SerialPort) => addWebSerialStore(port))
-    });
-
+  if (typeof window !== 'undefined') {
+  //  addWebSerialStore(null);
+    navigator.serial
+      .getPorts()
+      .then((ports) =>{
+        ports.forEach((port:SerialPort) => addWebSerialStore(port))
+      });
+      navigator.serial.addEventListener('connect', (event: Event) =>{
+        const port:SerialPort | null = event.target as SerialPort;
+        if(port) {
+          addWebSerialStore(port);
+        } else {
+          // ToDo:イベント発火したけどportに値が入っていない。
+        }
+      });
+      navigator.serial.addEventListener('disconnect', (event: Event) => {
+        const port:SerialPort | null = event.target as SerialPort;
+        if(port) {
+          removeWebSerialStore(port);
+        } else {
+          // ToDo:イベント発火したけどportに値が入っていない。
+        }
+      });
+  }    
   const create = async (
     requestPortFilters: SerialPortRequestOptions
   ): Promise<WebSerialPort> => {
-    try {
-      const port:SerialPort = await navigator.serial.requestPort(requestPortFilters);
-      return addWebSerialStore(port);
-    } catch (e) {
-      throw e
+    if (typeof window !== 'undefined') {    
+      try {
+        const port:SerialPort = await navigator.serial.requestPort(requestPortFilters);
+        return addWebSerialStore(port);
+      } catch (e) {
+        throw e
+      }
+    } else {
+      return new WebSerialPort(null)
     }
   };
-  navigator.serial.addEventListener('connect', (event: Event) =>{
-    const port:SerialPort | null = event.target as SerialPort;
-    if(port) {
-      addWebSerialStore(port);
-    } else {
-      // ToDo:イベント発火したけどportに値が入っていない。
-    }
-  });
-  navigator.serial.addEventListener('disconnect', (event: Event) => {
-    const port:SerialPort | null = event.target as SerialPort;
-    if(port) {
-      removeWebSerialStore(port);
-    } else {
-      // ToDo:イベント発火したけどportに値が入っていない。
-    }
-  });
   const subscribe = (cb: () => void): (() => boolean) => {
     return webSerialStore.subscribe(cb);
   };
