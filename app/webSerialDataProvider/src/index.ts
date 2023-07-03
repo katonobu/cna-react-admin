@@ -22,16 +22,6 @@ const webSerialProvider = (): DataProvider => {
             pid:'0x'+('0000'+wsp.pid.toString(16)).slice(-4),
             vid:'0x'+('0000'+wsp.vid.toString(16)).slice(-4),
             isOpen:wsp.isOpen?'Open':'Close',
-    /*
-            dataCarrierDetect:trueFalseNullToString(wsp.signals.dataCarrierDetect),
-            clearToSend:trueFalseNullToString(wsp.signals.clearToSend),
-            ringIndicator:trueFalseNullToString(wsp.signals.ringIndicator),
-            dataSetReady:trueFalseNullToString(wsp.signals.dataSetReady),
-            dataTerminalReady:trueFalseNullToString(wsp.signals.dataTerminalReady),
-            requestToSend:trueFalseNullToString(wsp.signals.requestToSend),
-            errorStr:wsp.errorStr,
-            rx:wsp.rx,
-    */
         }
     };
   

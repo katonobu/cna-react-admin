@@ -14,6 +14,7 @@ const AttachButton = () => {
     );
 }
 
+// 画面上部に表示するボタンの設定
 const ListActions = () => (
     <TopToolbar>
         <AttachButton/>
@@ -21,9 +22,18 @@ const ListActions = () => (
     </TopToolbar>    
 )
 
+// 全デバイスが削除したときに呼ばれる
 const Empty = () => {
-    const [create, { isLoading }] = useCreate('webserialport', {});
-    useEffect(()=>{create()},[create]);
+    const [create] = useCreate('webserialport', {});
+    
+    useEffect(()=>{
+        const timerId = setInterval(()=>{
+            if (webSerialPorts.getPorts().length === 0) {
+                clearInterval(timerId)
+                create()
+            }
+        },100)
+    },[create]);
     return (
         <Box textAlign="center" m={1}>
             <Typography variant="h4" paragraph>
@@ -47,32 +57,6 @@ export const SerialPortsList = () => {
             unsubscribe();
         })
     },[refresh])
-    /*
-    const [serialPortsStt, setSerialPortsStt] = useState([])
-    const updateSerialPortsList = useCallback(()=>{
-        setSerialPortsStt((prevStt:{id:string,openUnsub:()=>boolean}[])=>{
-            const newStt = webSerialPorts.getPorts().map((port)=>({id:port.idStr}))
-            const appendeds = newStt.filter((port)=>prevStt.find((pp)=>pp.id === port.id)?false:true)
-            // appendedsの要素をsubscribe
-            const withUnsubscribe = appendeds.map((port)=>({...port, openUnsub:webSerialPorts.getPortById(port.id)?.subscribeIsOpen(refresh)}))
-            const removeds = prevStt.filter((port)=>newStt.find((np)=>np.id === port.id)?false:true)
-            removeds.forEach((port)=>port.openUnsub())
-            // removedsの要素をunsubscribe
-            console.log("append:", withUnsubscribe)
-            console.log("remove:", removeds)
-            return [...withUnsubscribe]
-        })
-        refresh()
-    },[refresh])
-    useEffect(()=>{
-        updateSerialPortsList()
-        const unsubscribe = webSerialPorts.subscribe(updateSerialPortsList)
-        return (()=>{
-            unsubscribe();
-        })
-    },[updateSerialPortsList])
-    */
-
     return (
         <List
             empty={<Empty />}        
@@ -90,24 +74,3 @@ export const SerialPortsList = () => {
         </List>
     )
 };
-/*
-        <CreateButton/>
-
-import * as React from 'react';
-import { useUpdate, useRecordContext, Button } from 'react-admin';
-
-const ApproveButton = () => {
-    const record = useRecordContext();
-    const [approve, { isLoading }] = useUpdate('comments', { id: record.id, data: { isApproved: true }, previousData: record });
-    return <Button label="Approve" onClick={() => approve()} disabled={isLoading} />;
-};
-
-                <TextField source="rx" />
-                <TextField source="errorStr" />
-                <TextField source="dataCarrierDetect" />
-                <TextField source="clearToSend" />
-                <TextField source="ringIndicator" />
-                <TextField source="dataSetReady" />
-                <TextField source="dataTerminalReady" />
-                <TextField source="requestToSend" />
-*/

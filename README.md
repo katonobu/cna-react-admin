@@ -1,12 +1,9 @@
 # 状況
 - 現状の課題
-  - シリアル
-    - DeleteしてEmptyになったとき、Deleteの完了後の状態更新を待たずにrequestPort()を呼び出してるので、ポート選択画面で登録済み状態と表示される。
-      - Empty()への遷移をDeleteの完了後の状態更新を待ってからに遅延させられないか
+  - 左側のリスト、Webserialportsのアイコンはリストアイコンにして登録済デバイスも表示させたほうがいいか。
 
 - 今後の機能追加予定
-  - シリアル
-    - シリアルの送受信表示
+  - Edit画面で、シリアルの送受信表示
 
 - 解決した課題
   - Create操作時、いったん中身なしのページに飛んでSAVEボタンを押さないとrequestPort()の画面に飛ばない。
@@ -33,4 +30,12 @@
   - シリアルデバイスの挿抜でデータは増減するが、画面に反映しない。
     - useRefresh() で画面強制更新できる。
     - useEffect() でマウント時/案マウント時にuseRefreshの戻り値をwebSerialPortにsubscribeさせる。
-    
+
+  - DeleteしてEmptyになったとき、Deleteの完了後の状態更新を待たずにrequestPort()を呼び出してるので、ポート選択画面で登録済み状態と表示される。
+    - Empty()への遷移をDeleteの完了後の状態更新を待ってからに遅延させられないか
+      - app/serialPorts/src/SerialPortList.tsx のEmptyでタイマー回して100ms毎にportオブジェクトの長さを確認して、0になったらcreate()を呼ぶようにした。
+      - 実際のところ、数秒間undo可能なトーストが出ているので、その間は0にっていないようだ。。。
+
+  - Edit画面右側、ListItemの黒ぽっちがマージン持たずに境界線にかぶっている。
+    - 'list-style'をnoneに設定。
+    - reactでは'list-style'ではなく、listStyleにしなければならないのにハマった。
