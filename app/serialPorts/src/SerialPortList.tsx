@@ -40,6 +40,7 @@ const Empty = () => {
 export const SerialPortsList = () => {
     const refresh = useRefresh();
     useEffect(()=>{
+        console.log("Subscribe")
         const unsubscribe = webSerialPorts.subscribe(refresh)
         return (()=>{
             console.log("Unsubscribe")
