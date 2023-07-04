@@ -1,4 +1,3 @@
-"use client"
 // MIT License
 //
 // Copyright (c) 2021-2023 Nobuo Kato (katonobu4649@gmail.com)
@@ -438,12 +437,18 @@ export default (() => {
   };
 
   const getPorts = (): WebSerialPort[] => portObjs;
-  const getPortById = (idStr:string | number):WebSerialPort | undefined => {
+  const getPortById = (idStr:string | number):WebSerialPort => {
+    let port;
     if (typeof idStr === 'number') {
       const stredId = idStr.toString(10)
-      return portObjs.find((po)=>po.idStr === stredId)
+      port = portObjs.find((po)=>po.idStr === stredId)
     } else {
-      return portObjs.find((po)=>po.idStr === idStr)
+      port = portObjs.find((po)=>po.idStr === idStr)
+    }
+    if (port) {
+      return port
+    } else {
+      return new WebSerialPort(null)
     }
   }
   

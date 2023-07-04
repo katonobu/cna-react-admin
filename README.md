@@ -1,11 +1,17 @@
 # 状況
 - 現状の課題
   - 左側のリスト、Webserialportsのアイコンはリストアイコンにして登録済デバイスも表示させたほうがいいか。
+  - 現状受信したデータの切れ目で表示させてる→複数行まとめて改行コードでsplitしてデータ蓄積させる。
+  - データ蓄積はDataProviderとwebSerialPorts.tsの間に持っていきたい。
+  - record.idの値がすぐに取れない、suspensとか使うとうまくいく??
 
 - 今後の機能追加予定
   - Edit画面で、シリアルの送受信表示
 
 - 解決した課題
+  - Edit画面で、シリアルの送受信表示
+    - とりあえず送受信はできるようになった。
+
   - Create操作時、いったん中身なしのページに飛んでSAVEボタンを押さないとrequestPort()の画面に飛ばない。
     - useCreate()で生成した関数を呼び出すことで対応済。(app/serialPorts/src/SerialPortList.tsx)
     - app/serialPorts/src/SerialPortList.tsx で表示要素がないときの専用ページを作ったので、app/serialPorts/src/index.ts から createは抜いた。

@@ -1,7 +1,6 @@
-// in app/page.tsx
 "use client";
 import dynamic from 'next/dynamic'
-import { Resource} from "react-admin";
+import {Resource} from "react-admin";
 import serialPorts from "./serialPorts/src/"
 import webSerialProvider from "./webSerialDataProvider/src";
 
