@@ -95,9 +95,8 @@ const Title = () => {
 };
 
 // 受信処理&表示
-const RxData = () => {
+const RxData = ({maxDispLine = 40}) => {
     const record = useRecordContext();
-    const refresh = useRefresh();
     const [rxDatas, setRxData] = useState<string[]>([""])
     const [id, setId] = useState("")
     useEffect(()=>{
@@ -106,30 +105,24 @@ const RxData = () => {
                 return record.id as string
             })
         }
-    },[record, id, refresh])
+    },[record, id])
     useEffect(()=>{
         if (id !== "") {
             console.log("SubScribe Rx")
             const unsubscribe = webSerialPorts.getPortById(id).subscribeRx(()=>{
-//                refresh();
-                const rxU8a = webSerialPorts.getPortById(id).rx
-                console.log(rxU8a)
-                if (rxU8a) {
-                    const rxStr = new TextDecoder().decode(rxU8a)
-                    setRxData((old)=>[...old, rxStr])
-                    console.log(`refresh is called by Rx:${rxStr}`)
-                }
+                const rxStrs = webSerialPorts.getPortById(id).rx
+                setRxData((old)=>[...old, ...rxStrs].slice(-maxDispLine))
             })
             return (()=>{
                 console.log("UnsubScribe Rx")                
                 unsubscribe()
             })
         }
-    },[id, refresh])
-
+    },[id, maxDispLine])
+//    console.log(rxDatas)
     return (
         rxDatas.map((line, index) =>(
-            <Typography key={index.toString()}>{line}</Typography>
+            <Typography key={index.toString()}><pre>{line?line:" "}</pre></Typography>
         ))
     )
 }
@@ -142,7 +135,7 @@ export const SerialPortEdit = () => {
             title={<Title />}
         >
             <SimpleShowLayout>
-                <RxData></RxData>
+                <RxData  maxDispLine={40}></RxData>
             </SimpleShowLayout>
         </Show>
     );

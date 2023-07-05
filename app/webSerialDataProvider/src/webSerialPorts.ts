@@ -71,7 +71,7 @@ export default (() => {
     private signalsCallbacks: Set<() => void>;
     errorStr: string;
     private errorStrCallbacks: Set<() => void>;
-    rx: Uint8Array | null;
+    rx: string[];
     private rxCallbacks: Set<() => void>;
     private reader:
       | ReadableStreamDefaultReader<Uint8Array>
@@ -109,7 +109,7 @@ export default (() => {
       this.signalsCallbacks = new Set();
       this.errorStr = '';
       this.errorStrCallbacks = new Set();
-      this.rx = null;
+      this.rx = [];
       this.rxCallbacks = new Set();
       this.reader = undefined;
       WebSerialPort.idCount++;
@@ -146,7 +146,7 @@ export default (() => {
       this.rxCallbacks.add(cb);
       return () => this.rxCallbacks.delete(cb);
     }
-    private updateRx(newRx: Uint8Array | null) {
+    private updateRx(newRx: string[]) {
       this.rx = newRx;
       this.rxCallbacks.forEach((cb) => cb());
     }
@@ -220,10 +220,11 @@ export default (() => {
       return errStr;
     }
 
-    async receive(byteLength: number, timeoutMs: number): Promise<any> {
+    async receive(byteLength: number, timeoutMs: number, newLineCode: string = "\r\n"): Promise<any> {
       if (byteLength === 0 && timeoutMs === 0) {
         // read infinig until close
         const bufferSize = 8 * 1024; // 8kB
+        let lastLine = ""
         // if try to close, this.isOpen become false
         while (this.isOpen && this.port && this.port.readable) {
           try {
@@ -256,7 +257,21 @@ export default (() => {
               })();
 
               if (value) {
-                this.updateRx(value);
+                if (newLineCode) {
+                  let lines = (lastLine + new TextDecoder().decode(value)).split(newLineCode)
+                  const lastItem:string | undefined = lines.pop()
+                  if (typeof lastItem === 'string') {
+                    lastLine = lastItem
+                    if (0 < lines.length) {
+                      this.updateRx(lines);
+                    }
+                  } else {
+                    lastLine = ""
+                  }
+                } else {
+                  const rxStr:string = new TextDecoder().decode(value)
+                  this.updateRx([rxStr])
+                }
               }
               if (done) {
                 break;
