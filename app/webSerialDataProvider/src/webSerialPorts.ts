@@ -220,7 +220,7 @@ export default (() => {
       return errStr;
     }
 
-    async receive(byteLength: number, timeoutMs: number, newLineCode: string = "\r\n"): Promise<any> {
+    async receive(byteLength: number, timeoutMs: number, newLineCode: string | RegExp = /\r\n|\r|\n/): Promise<any> {
       if (byteLength === 0 && timeoutMs === 0) {
         // read infinig until close
         const bufferSize = 8 * 1024; // 8kB
