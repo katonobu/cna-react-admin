@@ -1,10 +1,10 @@
-import Button from '@mui/material/Button';
-import { Show, SimpleShowLayout } from 'react-admin';
+import { Show, SimpleShowLayout, Button } from 'react-admin';
 import { DeleteButton, TopToolbar, ListButton, useRecordContext } from 'react-admin';
 import {useEffect, useState} from 'react'
 import webSerialPorts from '../../webSerialDataProvider/src/webSerialPorts'
 import { useRefresh} from 'react-admin';
 import { Typography } from '@mui/material';
+import { Link } from 'react-router-dom';
 
 // 画面右上のボタン群の設定
 const Actions = () => {
@@ -45,27 +45,39 @@ const Actions = () => {
     return (
         <TopToolbar>
             <Button
-            color="primary"
-            disabled={!isOpen}
-            onClick={()=>{
-                const port = webSerialPorts.getPortById(record.id)
-                port.send(new TextEncoder().encode("Hello world\n"))
-            }}>SEND</Button>        
-            <Button color="primary" onClick={()=>{
-                const port = webSerialPorts.getPortById(record.id)
-                if (isOpen) {
-                    port.close()
-                } else {
-                    port.open({baudRate:115200})
-                    .then((errStr)=>{
-                        if (errStr) {
-                            console.error(errStr)
-                        } else {
-                            port.receive(0,0)
-                        }
-                    })
-                }
-            }}>{buttonText}</Button>        
+                label="customRouteSample"
+                color="primary"
+                component={Link}
+                to="/customRouteSample"
+            ></Button>
+            <Button
+                label="SEND"
+                color="primary"
+                disabled={!isOpen}
+                onClick={()=>{
+                    const port = webSerialPorts.getPortById(record.id)
+                    port.send(new TextEncoder().encode("Hello world\n"))
+                }}
+            ></Button>        
+            <Button
+                label={buttonText}
+                color="primary"
+                onClick={()=>{
+                    const port = webSerialPorts.getPortById(record.id)
+                    if (isOpen) {
+                        port.close()
+                    } else {
+                        port.open({baudRate:115200})
+                        .then((errStr)=>{
+                            if (errStr) {
+                                console.error(errStr)
+                            } else {
+                                port.receive(0,0)
+                            }
+                        })
+                    }
+                }}
+            ></Button>        
             <ListButton />
             <DeleteButton />
         </TopToolbar>

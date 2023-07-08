@@ -2,13 +2,20 @@ import { Datagrid, List, TextField, Button, TopToolbar, ExportButton} from 'reac
 import { useCreate, useRefresh} from 'react-admin';
 import AddIcon from '@mui/icons-material/Add';
 import { Box, Typography } from '@mui/material';
-import {useEffect, useCallback, useState} from 'react'
+import {useEffect} from 'react'
+import { Link } from 'react-router-dom';
 import webSerialPorts from '../../webSerialDataProvider/src/webSerialPorts'
 
 const AttachButton = () => {
     const [create, { isLoading }] = useCreate('webserialport', {});
     return (
-        <Button label="Select/Add" onClick={() => create()} disabled={isLoading}>
+        <Button
+            label="Select/Add"
+            onClick={
+                () => create()
+            }
+            disabled={isLoading}
+        >
             <AddIcon/>
         </Button>
     );
@@ -17,6 +24,12 @@ const AttachButton = () => {
 // 画面上部に表示するボタンの設定
 const ListActions = () => (
     <TopToolbar>
+        <Button
+            label="customRouteSample"
+            color="primary"
+            component={Link}
+            to="/customRouteSample"
+        ></Button>
         <AttachButton/>
         <ExportButton/>
     </TopToolbar>    
