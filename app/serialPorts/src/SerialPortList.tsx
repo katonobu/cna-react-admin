@@ -24,12 +24,6 @@ const AttachButton = () => {
 // 画面上部に表示するボタンの設定
 const ListActions = () => (
     <TopToolbar>
-        <Button
-            label="customRouteSample"
-            color="primary"
-            component={Link}
-            to="/customRouteSample"
-        ></Button>
         <AttachButton/>
         <ExportButton/>
     </TopToolbar>    

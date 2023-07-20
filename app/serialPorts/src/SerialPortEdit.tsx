@@ -1,13 +1,17 @@
 import { Show, SimpleShowLayout, Button } from 'react-admin';
 import { DeleteButton, TopToolbar, ListButton, useRecordContext } from 'react-admin';
+import {useGetRecordId} from 'react-admin'
 import {useEffect, useState} from 'react'
-import webSerialPorts from '../../webSerialDataProvider/src/webSerialPorts'
+import {useRef} from 'react'
 import { useRefresh} from 'react-admin';
-import { Typography } from '@mui/material';
-import { Link } from 'react-router-dom';
+import webSerialPorts from '../../webSerialDataProvider/src/webSerialPorts'
+import {useLastRxLine} from '../../webSerialDataProvider/src/webSerialDataProvider'
+
+import Xterm from './Xterm'
 
 // 画面右上のボタン群の設定
 const Actions = () => {
+    // ここはuseGetRecordId使うとすっきりしそう
     const record = useRecordContext();
     const refresh = useRefresh();
     const [id, setId] = useState<string>("")
@@ -44,12 +48,6 @@ const Actions = () => {
     }
     return (
         <TopToolbar>
-            <Button
-                label="customRouteSample"
-                color="primary"
-                component={Link}
-                to="/customRouteSample"
-            ></Button>
             <Button
                 label="SEND"
                 color="primary"
@@ -107,36 +105,15 @@ const Title = () => {
 };
 
 // 受信処理&表示
-const RxData = ({maxDispLine = 40}) => {
-    const record = useRecordContext();
-    const [rxDatas, setRxData] = useState<string[]>([""])
-    const [id, setId] = useState("")
-    useEffect(()=>{
-        if (record && 'id' in record && record.id !== id) {
-            setId((old)=>{
-                return record.id as string
-            })
-        }
-    },[record, id])
-    useEffect(()=>{
-        if (id !== "") {
-            console.log("SubScribe Rx")
-            const unsubscribe = webSerialPorts.getPortById(id).subscribeRx(()=>{
-                const rxStrs = webSerialPorts.getPortById(id).rx
-                setRxData((old)=>[...old, ...rxStrs].slice(-maxDispLine))
-            })
-            return (()=>{
-                console.log("UnsubScribe Rx")                
-                unsubscribe()
-            })
-        }
-    },[id, maxDispLine])
-//    console.log(rxDatas)
-    return (
-        rxDatas.map((line, index) =>(
-            <Typography key={index.toString()}><pre>{line?line:" "}</pre></Typography>
-        ))
-    )
+const RxTerminal = (props:any) => {
+    const recordId = useGetRecordId();
+    const xtermRef = useRef<Xterm>(null);
+    const lastRxLine = useLastRxLine(recordId.toString(10))
+    if (xtermRef.current?.terminal) {
+        lastRxLine.forEach((line)=>xtermRef.current?.terminal.writeln(line))
+        console.log(lastRxLine)
+    }
+    return (<Xterm ref={xtermRef}></Xterm>)
 }
 
 export const SerialPortEdit = () => {
@@ -147,7 +124,7 @@ export const SerialPortEdit = () => {
             title={<Title />}
         >
             <SimpleShowLayout>
-                <RxData  maxDispLine={40}></RxData>
+                <RxTerminal></RxTerminal>
             </SimpleShowLayout>
         </Show>
     );
