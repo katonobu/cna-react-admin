@@ -175,6 +175,7 @@ export default (() => {
     }
 
     async close(): Promise<string> {
+      this.updateRx([])
       let errStr: string = '';
       if (this.port) {
         this.updateIsOpen(false);
