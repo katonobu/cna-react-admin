@@ -155,6 +155,7 @@ export default (() => {
       let errStr: string = '';
       if (this.port) {
         try {
+          this.updateRx([])
           await this.port.open(options);
         } catch (e) {
           errStr = 'Error at oepn.';
