@@ -1,43 +1,40 @@
-import { Show, SimpleShowLayout, Button } from 'react-admin';
+import { useState } from 'react'
+import { Show, SimpleShowLayout, Button, useDelete} from 'react-admin';
 import { DeleteButton, TopToolbar, ListButton, useRecordContext } from 'react-admin';
-import { useEffect, useState } from 'react'
-import { useRefresh} from 'react-admin';
+import { useGetRecordId } from 'react-admin'
 import webSerialPorts from '../../webSerialDataProvider/src/webSerialPorts'
+import {useIsOpen } from '../../webSerialDataProvider/src/webSerialDataProvider'
 import MapPage from './leafletLoader'
 import RxTerminal from './RxTerminal';
 
+const PortDeleteButton = (props:any) => {
+	const recordId = useGetRecordId()
+    const isOpen = useIsOpen(recordId.toString(10))
+    return (
+        <DeleteButton disabled={isOpen}></DeleteButton>
+    )
+}
 
-// 画面右上のボタン群の設定
-const Actions = () => {
-    // ここはuseGetRecordId使うとすっきりしそう
-    const record = useRecordContext();
-    const refresh = useRefresh();
-    const [id, setId] = useState<string>("")
-    useEffect(()=>{
-        if (record && 'id' in record && typeof(record.id) === 'string' && record.id !== id) {
-            setId((old)=>{
-                return record.id as string
-            })
-        }
-    },[record, id, refresh])
-    useEffect(()=>{
-        if (id !== "") {
-            console.log("SubScribe isOpen")
-            const unsubscribe = webSerialPorts.getPortById(id).subscribeIsOpen(()=>{
-                refresh();
-                console.log("refresh is called by Open")
-            })
-            return (()=>{
-                console.log("UnsubScribe isOpen")                
-                unsubscribe()
-            })
-        }
-    },[id, refresh])
-
-    let isOpen:boolean = false
-    if(record && 'id' in record && 'venderName' in record && 'isOpen' in record){
-        isOpen = record.isOpen === 'Open'
-    }
+const SendButton = ()=>{
+	const recordId = useGetRecordId()
+    const isOpen = useIsOpen(recordId.toString(10))
+    return (
+        <Button
+            label="SEND"
+            color="primary"
+            disabled={!isOpen}
+            onClick={()=>{
+                const port = webSerialPorts.getPortById(recordId)
+                port.send(new TextEncoder().encode("Hello world\n"))
+            }}
+        ></Button>        
+    )
+}
+const OpenCloseButton = ()=> {
+	const recordId = useGetRecordId()
+    const port = webSerialPorts.getPortById(recordId)
+    const isOpen = useIsOpen(recordId.toString(10))
+    const [disabled, setDisabled] = useState(false)
     let buttonText = ""
     if (isOpen) {
         buttonText = "Close Port"
@@ -45,50 +42,58 @@ const Actions = () => {
         buttonText = "Open Port"
     }
     return (
-        <TopToolbar>
-            <Button
-                label="SEND"
-                color="primary"
-                disabled={!isOpen}
-                onClick={()=>{
-                    const port = webSerialPorts.getPortById(record.id)
-                    port.send(new TextEncoder().encode("Hello world\n"))
-                }}
-            ></Button>        
-            <Button
-                label={buttonText}
-                color="primary"
-                onClick={()=>{
-                    const port = webSerialPorts.getPortById(record.id)
-                    if (isOpen) {
-                        port.close()
-                    } else {
-                        port.open({baudRate:115200})
-                        .then((errStr)=>{
-                            if (errStr) {
-                                console.error(errStr)
-                            } else {
-                                port.receive(0,0)
-                            }
-                        })
-                    }
-                }}
-            ></Button>        
-            <ListButton />
-            <DeleteButton />
-        </TopToolbar>
-    );
-};
+        <Button
+            disabled = {disabled}
+            label={buttonText}
+            color="primary"
+            onClick={()=>{
+                if (isOpen) {
+                    setDisabled(true)
+                    port.close()
+                    .then((errStr)=>{
+                        if (errStr) {
+                            console.error(errStr)
+                        }
+                        setDisabled(false)
+                    })
+                } else {
+                    setDisabled(true)
+                    port.open({baudRate:115200})
+                    .then((errStr)=>{
+                        if (errStr) {
+                            console.error(errStr)
+                        } else {
+                            port.receive(0,0)
+                        }
+                        setDisabled(false)
+                    })
+                }
+            }}
+        ></Button>        
+    )
+}
+
+// 画面右上のボタン群の設定
+const Actions = () => (
+    <TopToolbar>
+        <SendButton />
+        <OpenCloseButton />
+        <ListButton />
+        <PortDeleteButton />
+    </TopToolbar>
+);
 
 // 画面右側の表示
 const Aside = () => {
+	const recordId = useGetRecordId()
+    const isOpen = useIsOpen(recordId.toString(10))
     const record = useRecordContext();
-    if(record && 'id' in record && 'venderName' in record && 'isOpen' in record){
+    if(record && 'venderName' in record){
         return (
             <ul style={{ width: 200, margin: '1em' }}>
-                <li style={{listStyle: 'none'}}>ID:{record.id}</li>
+                <li style={{listStyle: 'none'}}>ID:{recordId}</li>
                 <li style={{listStyle: 'none'}}>Name:{record.venderName}</li>
-                <li style={{listStyle: 'none'}}>Open:{record.isOpen}</li>
+                <li style={{listStyle: 'none'}}>Open:{isOpen.toString()}</li>
             </ul>
         );
     } else {

@@ -3,9 +3,11 @@ import { useCreate, useRefresh} from 'react-admin';
 import AddIcon from '@mui/icons-material/Add';
 import { Box, Typography } from '@mui/material';
 import {useEffect} from 'react'
-import webSerialPorts from '../../webSerialDataProvider/src/webSerialPorts'
+import {useSerialPortLen, subscribeSerialPortLen} from '../../webSerialDataProvider/src/webSerialDataProvider'
 
-const AttachButton = () => {
+const AttachButton = (props:{disable_not_empty?:boolean}) => {
+    const {disable_not_empty = false} = props
+    const portLen = useSerialPortLen()
     const [create, { isLoading }] = useCreate('webserialport', {});
     return (
         <Button
@@ -13,7 +15,7 @@ const AttachButton = () => {
             onClick={
                 () => create()
             }
-            disabled={isLoading}
+            disabled={isLoading || (disable_not_empty && 0 < portLen)}
         >
             <AddIcon/>
         </Button>
@@ -28,18 +30,15 @@ const ListActions = () => (
     </TopToolbar>    
 )
 
-// 全デバイスが削除したときに呼ばれる
+// 全デバイスが削除されたときの表示ページ
 const Empty = () => {
     const [create] = useCreate('webserialport', {});
-    
+    const portLen = useSerialPortLen()    
     useEffect(()=>{
-        const timerId = setInterval(()=>{
-            if (webSerialPorts.getPorts().length === 0) {
-                clearInterval(timerId)
-                create()
-            }
-        },100)
-    },[create]);
+        if (portLen === 0) {
+            create()
+        }
+    },[create, portLen]);
     return (
         <Box textAlign="center" m={1}>
             <Typography variant="h4" paragraph>
@@ -48,7 +47,7 @@ const Empty = () => {
             <Typography variant="body1">
                 Select / Registrate one 
             </Typography>
-            <AttachButton />
+            <AttachButton disable_not_empty={true}/>
         </Box>
     )
 }
@@ -56,10 +55,8 @@ const Empty = () => {
 export const SerialPortsList = () => {
     const refresh = useRefresh();
     useEffect(()=>{
-        console.log("Subscribe SerialPortList")
-        const unsubscribe = webSerialPorts.subscribe(refresh)
+        const unsubscribe = subscribeSerialPortLen(refresh)
         return (()=>{
-            console.log("Unsubscribe SerialPortList")
             unsubscribe();
         })
     },[refresh])
