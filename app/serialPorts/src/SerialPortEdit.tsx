@@ -1,13 +1,11 @@
 import { Show, SimpleShowLayout, Button } from 'react-admin';
 import { DeleteButton, TopToolbar, ListButton, useRecordContext } from 'react-admin';
-import {useGetRecordId} from 'react-admin'
-import {useEffect, useState} from 'react'
-import {useRef} from 'react'
+import { useEffect, useState } from 'react'
 import { useRefresh} from 'react-admin';
 import webSerialPorts from '../../webSerialDataProvider/src/webSerialPorts'
-import {useLastRxLine} from '../../webSerialDataProvider/src/webSerialDataProvider'
+import MapPage from './leafletLoader'
+import RxTerminal from './RxTerminal';
 
-import Xterm from './Xterm'
 
 // 画面右上のボタン群の設定
 const Actions = () => {
@@ -104,18 +102,6 @@ const Title = () => {
     return <span>{record && 'venderName' in record ? record.venderName : record.id}</span>;
 };
 
-// 受信処理&表示
-const RxTerminal = (props:any) => {
-    const recordId = useGetRecordId();
-    const xtermRef = useRef<Xterm>(null);
-    const lastRxLine = useLastRxLine(recordId.toString(10))
-    if (xtermRef.current?.terminal) {
-        lastRxLine.forEach((line)=>xtermRef.current?.terminal.writeln(line))
-        console.log(lastRxLine)
-    }
-    return (<Xterm ref={xtermRef}></Xterm>)
-}
-
 export const SerialPortEdit = () => {
     return (
         <Show
@@ -125,6 +111,7 @@ export const SerialPortEdit = () => {
         >
             <SimpleShowLayout>
                 <RxTerminal></RxTerminal>
+                <MapPage></MapPage>
             </SimpleShowLayout>
         </Show>
     );

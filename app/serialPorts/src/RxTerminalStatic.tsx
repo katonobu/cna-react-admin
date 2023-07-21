@@ -5,6 +5,8 @@
 
 import * as React from 'react'
 import PropTypes from 'prop-types'
+import {useGetRecordId} from 'react-admin'
+import {useLastRxLine} from '../../webSerialDataProvider/src/webSerialDataProvider'
 
 import 'xterm/css/xterm.css'
 
@@ -107,7 +109,7 @@ interface IProps {
 	customKeyEventHandler?(event: KeyboardEvent): boolean
 }
 
-export default class Xterm extends React.Component<IProps> {
+class Xterm extends React.Component<IProps> {
 	/**
 	 * The ref for the containing element.
 	 */
@@ -240,3 +242,17 @@ export default class Xterm extends React.Component<IProps> {
 		return <div className={this.props.className} ref={this.terminalRef} />
 	}
 }
+
+const RxTerminalStatic = (props:any) => {
+	const recordId = useGetRecordId();
+	const xtermRef = React.useRef<Xterm>(null);
+	const lastRxLine = useLastRxLine(recordId.toString(10))
+	if (xtermRef.current?.terminal) {
+		lastRxLine.forEach((line)=>xtermRef.current?.terminal.writeln(line))
+//        console.log(lastRxLine)
+	}
+	return (<Xterm ref={xtermRef}></Xterm>)
+}
+  
+export default RxTerminalStatic
+  
