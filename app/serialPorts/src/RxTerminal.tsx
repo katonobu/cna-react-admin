@@ -5,7 +5,7 @@ const RxTerminal = (props:any) => {
   const RxTerm = useMemo(
     () =>
       dynamic(() => import("./RxTerminalStatic"), {
-        loading: () => <p>Rx Terminal is loading</p>,
+        loading: () => null,
         ssr: false,
       }),
     []

@@ -22,3 +22,6 @@ export const subscribeSerialPortLen = (callback:any) => {
     return ()=>unsubscribe()
 }
 export const useSerialPortLen = () => useSyncExternalStore(subscribeSerialPortLen, getSerialPortLen)
+
+const getSerialPorts = () =>webSerialPorts.getPorts()
+export const useSerialPorts = () => useSyncExternalStore(subscribeSerialPortLen, getSerialPorts)

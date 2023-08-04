@@ -5,7 +5,7 @@ function MapPage() {
   const Map = React.useMemo(
     () =>
       dynamic(() => import("./leafletMap"), {
-        loading: () => <p>A map is loading</p>,
+        loading: () => null,
         ssr: false,
       }),
     []

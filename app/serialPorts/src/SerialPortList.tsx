@@ -1,7 +1,7 @@
-import { Datagrid, List, TextField, Button, TopToolbar, ExportButton} from 'react-admin';
+import { Datagrid, List, TextField, Button, TopToolbar, ExportButton, SimpleList} from 'react-admin';
 import { useCreate, useRefresh} from 'react-admin';
 import AddIcon from '@mui/icons-material/Add';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, useMediaQuery } from '@mui/material';
 import {useEffect} from 'react'
 import {useSerialPortLen, subscribeSerialPortLen} from '../../webSerialDataProvider/src/webSerialDataProvider'
 
@@ -45,7 +45,7 @@ const Empty = () => {
                 No registrated serialport available
             </Typography>
             <Typography variant="body1">
-                Select / Registrate one 
+                Select / Add one 
             </Typography>
             <AttachButton disable_not_empty={true}/>
         </Box>
@@ -54,6 +54,7 @@ const Empty = () => {
 
 export const SerialPortsList = () => {
     const refresh = useRefresh();
+    const isSmall = useMediaQuery((theme:any) => theme.breakpoints.down('sm'));    
     useEffect(()=>{
         const unsubscribe = subscribeSerialPortLen(refresh)
         return (()=>{
@@ -65,15 +66,23 @@ export const SerialPortsList = () => {
             empty={<Empty />}        
             actions={<ListActions/>}
         >
-            <Datagrid
-                rowClick='edit'
-            >
-                <TextField source="id" />
-                <TextField source="vid" />
-                <TextField source="venderName" />
-                <TextField source="pid" />
-                <TextField source="isOpen" />
-            </Datagrid>
+            {isSmall?(
+                <SimpleList
+                    primaryText={record => record.id}
+                    secondaryText={record => record.venderName}
+                    tertiaryText={record => record.isOpen}
+                />
+            ):(
+                <Datagrid
+                    rowClick='edit'
+                >
+                    <TextField source="id" />
+                    <TextField source="vid" />
+                    <TextField source="venderName" />
+                    <TextField source="pid" />
+                    <TextField source="isOpen" />
+                </Datagrid>
+            )}
         </List>
     )
 };

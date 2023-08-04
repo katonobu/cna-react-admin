@@ -113,6 +113,7 @@ export const SerialPortEdit = () => {
             actions={<Actions />}
             aside={<Aside />}    
             title={<Title />}
+            emptyWhileLoading
         >
             <SimpleShowLayout>
                 <RxTerminal></RxTerminal>
