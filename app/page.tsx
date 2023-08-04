@@ -23,7 +23,7 @@ const MyMenu = () => {
   const serialPorts= useSerialPorts()
   useEffect(() => {
     const devices = serialPorts.map((val)=>(
-        <Menu.Item to={`/List_Add_Port/${val.idStr}`} primaryText={val.idStr} leftIcon={<SerialPortIcon />}/>      
+        <Menu.Item to={`/List_Add_Port/${val.idStr}`} key={val.idStr} primaryText={val.idStr} leftIcon={<SerialPortIcon />}/>      
     ))
     setPortsInfo(()=>[baseResource, ...devices])
   }, [serialPorts]);  
