@@ -76,10 +76,14 @@ const OpenCloseButton = ()=> {
 // 画面右上のボタン群の設定
 const Actions = () => (
     <TopToolbar>
-        <SendButton />
-        <OpenCloseButton />
-        <ListButton />
-        <PortDeleteButton />
+        <div style={{ marginRight: 'auto' }}>
+            <OpenCloseButton />
+            <SendButton />
+        </div>
+        <div style={{ marginLeft: 'auto' }}>
+            <ListButton />
+            <PortDeleteButton />
+        </div>
     </TopToolbar>
 );
 
