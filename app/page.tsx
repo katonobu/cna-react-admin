@@ -18,14 +18,14 @@ const Admin = dynamic(() => import('react-admin').then((module)=>module.Admin), 
   ssr: false, // サーバーサイドレンダリングを無効化
 });
 
-const baseResource = <Menu.Item to={"/List_Add_Port"} primaryText="List/Add Port" leftIcon={<PlaylistAddIcon />} />
+const baseResource = <Menu.Item to={"/List_Add_Port"} key={'list_add_port'} primaryText="List/Add Port" leftIcon={<PlaylistAddIcon />} />
 const MyMenu = () => {
   const [portsInfo, setPortsInfo] = useState([baseResource])
   const serialPorts= useSerialPorts()
   // SerialPortIcon　固定値で色指定しているのがイケてない。。。
   useEffect(() => {
     const devices = serialPorts.map((val)=>{
-        console.log(val)
+//        console.log(val)
         return (<Menu.Item
           to={`/List_Add_Port/${val.idStr}`}
           key={val.idStr}
