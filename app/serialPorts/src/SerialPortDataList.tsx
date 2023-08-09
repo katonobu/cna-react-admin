@@ -33,6 +33,7 @@ export const SerialPortsDataList = (props:any) => {
         hasNextPage,
     } = useInfiniteGetList('Port_Rx_Data', {
         pagination: { page: 0, perPage: 10 },
+        meta: {id:parseInt(id, 10)}
     });
 //    console.log(data)
 

@@ -35,7 +35,8 @@ const webSerialProvider = (): DataProvider => {
                     total:wsps.length
                 } as GetListResult);
             } else if (resource === 'Port_Rx_Data') {
-                const result = getRxLineBuffers(0, params.pagination.page, params.pagination.perPage)
+                const id:number = params.meta.id
+                const result = getRxLineBuffers(id, params.pagination.page, params.pagination.perPage)
 //                console.log(resource, params, result)
                 return Promise.resolve(result as GetListResult)
             } else {
