@@ -52,6 +52,9 @@ const Empty = () => {
     )
 }
 
+
+// レスポンシブ対応は https://marmelab.com/react-admin/ListTutorial.html#responsive-lists より引用
+// バルク選択 enable/disable制御は https://marmelab.com/react-admin/Datagrid.html#isrowselectable より引用
 export const SerialPortsList = () => {
     const refresh = useRefresh();
     const isSmall = useMediaQuery((theme:any) => theme.breakpoints.down('sm'));    
@@ -75,6 +78,7 @@ export const SerialPortsList = () => {
             ):(
                 <Datagrid
                     rowClick='edit'
+                    isRowSelectable={ record => (record.isOpen === 'Close') }
                 >
                     <TextField source="id" />
                     <TextField source="vid" />
