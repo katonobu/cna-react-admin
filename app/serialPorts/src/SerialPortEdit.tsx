@@ -4,7 +4,6 @@ import { DeleteButton, TopToolbar, ListButton, useRecordContext } from 'react-ad
 import { useGetRecordId } from 'react-admin'
 import webSerialPorts from '../../webSerialDataProvider/src/webSerialPorts'
 import {useIsOpen } from '../../webSerialDataProvider/src/webSerialDataProvider'
-import MapPage from './leafletLoader'
 import RxTerminal from './RxTerminal';
 
 const PortDeleteButton = (props:any) => {
@@ -104,7 +103,7 @@ const Aside = () => {
 // タイトル文字列の設定
 const Title = () => {
     const record = useRecordContext();
-    return <span>{record && 'venderName' in record ? record.venderName : record.id}</span>;
+    return <span>{record && 'venderName' in record ? record.id+':'+record.venderName: record.id}</span>;
 };
 
 export const SerialPortEdit = () => {
