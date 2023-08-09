@@ -20,7 +20,7 @@ function make_d_vline(x:number, y_s:number, y_b:number, w:number) {
     )
 }
 
-function SerialPortIcon(props:any) {
+function SerialPortIcon2(props:any) {
     // https://material.io/design/iconography/system-icons.html#design-principles
     // https://www.iso.org/obp/ui#iec:grs:60417:5850
     // strokeは明示的に指定した色しか付かない。
@@ -46,4 +46,83 @@ function SerialPortIcon(props:any) {
     );
 }
 
+const SerialPortIcon = (props:any) => (
+  <SvgIcon {...props}>
+    <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg">
+    <path d="M 12,     7
+            L  20,     7
+            Q  22.59,  7, 
+               21.92,  9.55
+            L  19.92, 16.55
+            Q  19.16, 18, 
+               18,    18
+            L   6,    18
+            Q   4.84, 18, 
+                4.08, 16.55
+            L   2.08,  9.55
+            Q   1.41,  7,
+                4,     7
+            L  12,     7
+            L  12,     9
+            L   4,     9
+            L   6,    16
+            L  18,    16
+            L  20,     9
+            L  12,     9
+            z"
+    stroke-width="0"/>
+    {[6,9,12,15,18].map((x)=>(<circle cx={x.toString(10)} cy="11" r="1" key={x.toString(10)}/>))}
+    {[7.5, 10.5, 13.5, 16.5].map((x)=>(<circle cx={x.toString(10)} cy="14" r="1" key={x.toString(10)}/>))}
+  </svg>
+</SvgIcon>
+)
 export default SerialPortIcon;
+/*
+    <path d="M 12,     7
+            L  20,     7
+            Q  22.59,  7, 
+               21.92,  9.55
+            L  19.92, 16.55
+            Q  19.16, 18, 
+               18,    18
+            L   6,    18
+            Q   4.84, 18, 
+                4.08, 16.55
+            L   2.08,  9.55
+            Q   1.41,  7,
+                4,     7
+            L  12,     7
+            L  12,     9
+            L   4,     9
+            L   6,    16
+            L  18,    16
+            L  20,     9
+            L  12,     9
+            z"
+    stroke-width="0"/>
+
+
+    <path d="M 12,     6.5
+            L  20,     6.5
+            Q  22.6,   6.5, 
+               21.923, 9.05
+            L  19.923,16.05
+            Q  19.1,  17.5, 
+               18,    17.5
+            L   6,    17.5
+            Q   4.84, 17.5, 
+                4.02, 16.05
+            L   2.08,  9.05
+            Q   1.41,  6.5,
+                4,     6.5
+            L  12,     6.5
+            L  12,     8.5
+            L   4,     8.5
+            L   6,    15.5
+            L  18,    15.5
+            L  20,     8.5
+            L  12,     8.5
+            z"
+    stroke-width="0"/>
+
+*/
