@@ -46,36 +46,52 @@ function SerialPortIcon2(props:any) {
     );
 }
 
-const SerialPortIcon = (props:any) => (
-  <SvgIcon {...props}>
-    <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg">
-    <path d="M 12,     7
-            L  20,     7
-            Q  22.59,  7, 
-               21.92,  9.55
-            L  19.92, 16.55
-            Q  19.16, 18, 
-               18,    18
-            L   6,    18
-            Q   4.84, 18, 
-                4.08, 16.55
-            L   2.08,  9.55
-            Q   1.41,  7,
-                4,     7
-            L  12,     7
-            L  12,     9
-            L   4,     9
-            L   6,    16
-            L  18,    16
-            L  20,     9
-            L  12,     9
-            z"
-    stroke-width="0"/>
-    {[6,9,12,15,18].map((x)=>(<circle cx={x.toString(10)} cy="11" r="1" key={x.toString(10)}/>))}
-    {[7.5, 10.5, 13.5, 16.5].map((x)=>(<circle cx={x.toString(10)} cy="14" r="1" key={x.toString(10)}/>))}
-  </svg>
-</SvgIcon>
-)
+const SerialPortIcon = (props:any) => {
+   const {color} = props
+   return (<SvgIcon {...props}>
+      <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill={color}>
+         <path d="M  12,     7
+                  L  20,     7
+                  Q  22.59,  7, 
+                     21.92,  9.55
+                  L  19.92, 16.55
+                  Q  19.16, 18, 
+                     18,    18
+                  L   6,    18
+                  Q   4.84, 18, 
+                     4.08, 16.55
+                  L   2.08,  9.55
+                  Q   1.41,  7,
+                      4,     7
+                  L  12,     7
+                  L  12,     9
+                  L   4,     9
+                  L   6,    16
+                  L  18,    16
+                  L  20,     9
+                  L  12,     9
+                  z"
+            stroke-width="0"/>
+         {[6,9,12,15,18].map((x)=>(
+            <circle
+               cx={x.toString(10)}
+               cy="11"
+               r="1"
+               key={x.toString(10)}
+            />
+         ))}
+         {[7.5, 10.5, 13.5, 16.5].map((x)=>(
+            <circle
+               cx={x.toString(10)}
+               cy="14"
+               r="1"
+               key={x.toString(10)}
+            />
+         ))}
+      </svg>
+   </SvgIcon>
+   )
+}
 export default SerialPortIcon;
 /*
     <path d="M 12,     7

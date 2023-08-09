@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react'
 import { useSerialPorts } from '@/app/webSerialDataProvider/src/webSerialDataProvider'
 import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
 import SerialPortIcon from '@/app/serialPorts/src/SerialPortIcon'
+import UsbIcon from '@mui/icons-material/Usb';
 import {SerialPortsList} from '@/app/serialPorts/src/SerialPortList'
 import {SerialPortEdit} from '@/app/serialPorts/src/SerialPortEdit'
 
@@ -21,10 +22,17 @@ const baseResource = <Menu.Item to={"/List_Add_Port"} primaryText="List/Add Port
 const MyMenu = () => {
   const [portsInfo, setPortsInfo] = useState([baseResource])
   const serialPorts= useSerialPorts()
+  // SerialPortIcon　固定値で色指定しているのがイケてない。。。
   useEffect(() => {
-    const devices = serialPorts.map((val)=>(
-        <Menu.Item to={`/List_Add_Port/${val.idStr}`} key={val.idStr} primaryText={val.idStr} leftIcon={<SerialPortIcon />}/>      
-    ))
+    const devices = serialPorts.map((val)=>{
+        console.log(val)
+        return (<Menu.Item
+          to={`/List_Add_Port/${val.idStr}`}
+          key={val.idStr}
+          primaryText={val.idStr}
+          leftIcon={(val.pid===0 && val.vid===0)?<SerialPortIcon color="rgba(0, 0, 0, 0.54)"/>:<UsbIcon />}
+        />)
+    })
     setPortsInfo(()=>[baseResource, ...devices])
   }, [serialPorts]);  
 
