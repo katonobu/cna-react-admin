@@ -35,28 +35,28 @@ interface vendersListType {
   field_vid: string;
 }
 
-export default (() => {
-  class MicroStore <T> {
-    private obj: T;
-    private callbacks: Set<() => void>;
+export class MicroStore <T> {
+  private obj: T;
+  private callbacks: Set<() => void>;
 
-    constructor(initObj: T){
-      this.obj = initObj
-      this.callbacks = new Set<() => void>();
-    }
-    subscribe(cb: () => void): () => boolean {
-      this.callbacks.add(cb);
-      return () => this.callbacks.delete(cb);
-    }
-    update(newObj: T){
-      this.obj = newObj
-      this.callbacks.forEach(cb => cb())
-    }
-    get(): T{
-      return this.obj
-    }
+  constructor(initObj: T){
+    this.obj = initObj
+    this.callbacks = new Set<() => void>();
   }
+  subscribe(cb: () => void): () => boolean {
+    this.callbacks.add(cb);
+    return () => this.callbacks.delete(cb);
+  }
+  update(newObj: T){
+    this.obj = newObj
+    this.callbacks.forEach(cb => cb())
+  }
+  get(): T{
+    return this.obj
+  }
+}
 
+export default (() => {
   class WebSerialPort{
     static idCount: number = 0;
 
@@ -473,6 +473,7 @@ export default (() => {
     getPorts,
     subscribe,
     create,
-    getPortById
+    getPortById,
+    getMaxId:()=>WebSerialPort.idCount
   };
 })();
