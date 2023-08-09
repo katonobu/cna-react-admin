@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Show, SimpleShowLayout, Button, useDelete} from 'react-admin';
+import { Show, SimpleShowLayout, Button} from 'react-admin';
 import { DeleteButton, TopToolbar, ListButton, useRecordContext } from 'react-admin';
 import { useGetRecordId } from 'react-admin'
 import webSerialPorts from '../../webSerialDataProvider/src/webSerialPorts'
@@ -117,7 +117,6 @@ export const SerialPortEdit = () => {
         >
             <SimpleShowLayout>
                 <RxTerminal></RxTerminal>
-                <MapPage></MapPage>
             </SimpleShowLayout>
         </Show>
     );
