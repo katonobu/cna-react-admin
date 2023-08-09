@@ -2,6 +2,7 @@ import { DataProvider } from 'ra-core';
 import { CreateResult, DeleteResult, DeleteManyResult, GetListResult, GetManyReferenceResult, GetManyResult, GetOneResult, UpdateManyResult, UpdateResult } from 'react-admin';
     
 import webSerialPorts from './webSerialPorts';
+import {getRxLineBuffers} from './webSerialDataProvider'
 
 const webSerialProvider = (): DataProvider => {
     console.log("webSerialProvider init.")
@@ -27,11 +28,19 @@ const webSerialProvider = (): DataProvider => {
   
     return {
         getList: (resource, params) => {
-            const wsps = webSerialPorts.getPorts()
-            return Promise.resolve({
-                data:wsps.map((wsp)=>serializeWebSerialPort(wsp)),
-                total:wsps.length
-            } as GetListResult);
+            if (resource === 'List_Add_Port') {
+                const wsps = webSerialPorts.getPorts()
+                return Promise.resolve({
+                    data:wsps.map((wsp)=>serializeWebSerialPort(wsp)),
+                    total:wsps.length
+                } as GetListResult);
+            } else if (resource === 'Port_Rx_Data') {
+                const result = getRxLineBuffers(0, params.pagination.page, params.pagination.perPage)
+//                console.log(resource, params, result)
+                return Promise.resolve(result as GetListResult)
+            } else {
+                return Promise.resolve({data:[{id:0}], total:1} as GetListResult)
+            }
         },
 
         getOne: (resource, params) =>{

@@ -18,25 +18,26 @@ const getSerialPorts = () =>webSerialPorts.getPorts()
 export const useSerialPorts = () => useSyncExternalStore(subscribeSerialPortLen, getSerialPorts)
 
 const rxLineBuffers:MicroStore<rxLineBuffType[]>[] = []
-const rxLineBufferUpdateLines:any[] = []
+const rxLineBufferLines:any[] = []
 subscribeSerialPortLen(()=>{
-    for (let id = rxLineBuffers.length; id < webSerialPorts.getMaxId(); id++) {
-        console.log("AddPorts", id)
-        rxLineBuffers[id] = new MicroStore([])
-        rxLineBufferUpdateLines[id] = {lines:0}
-        webSerialPorts.getPortById(id).subscribeRx(()=>{
+    for (let portId = rxLineBuffers.length; portId < webSerialPorts.getMaxId(); portId++) {
+        console.log("AddPorts", portId)
+        rxLineBuffers[portId] = new MicroStore([])
+        rxLineBufferLines[portId] = {totalLines:0, updatedLines:0}
+        webSerialPorts.getPortById(portId).subscribeRx(()=>{
             const ts:number = (new Date()).getTime()
-            const rxLines = webSerialPorts.getPortById(id).rx
-            rxLineBufferUpdateLines[id] = {lines:rxLines.length}
-            const addLines = rxLines.map((data)=>({data, ts}))
-            console.log(id, ts, rxLines.length, addLines)
-            const newRxLines = rxLineBuffers[id].get().concat(addLines)
+            const rxLines = webSerialPorts.getPortById(portId).rx
+            const idBase = rxLineBuffers[portId].get().length
+            const addLines = rxLines.map((data, idx)=>({data, ts, id:idx+idBase}))
+//            console.log(portId, ts, rxLines.length, addLines)
+            const newRxLines = rxLineBuffers[portId].get().concat(addLines)
+            rxLineBufferLines[portId] = {totalLines:newRxLines.length, updatedLines:rxLines.length}
 //            console.log(id, ts, rxLines.length, newRxLines)
-            rxLineBuffers[id].update(newRxLines)
+            rxLineBuffers[portId].update(newRxLines)
         })
     }
 })
-const getRxLineBufferBuilder = (id:string) => ()=>rxLineBufferUpdateLines[parseInt(id, 10)]
+const getRxLineBufferBuilder = (id:string) => ()=>rxLineBufferLines[parseInt(id, 10)]
 const subscribeRxLineBufferBuilder = (id:string) => (callback:any) => {
 //    console.log("subscribe", id)
 //    const unsubscribe = rxLineBuffers[parseInt(id, 10)].subscribe(()=>{console.log("callback is called");callback()})
@@ -44,6 +45,21 @@ const subscribeRxLineBufferBuilder = (id:string) => (callback:any) => {
     return ()=>unsubscribe()
 }
 export const useRxLineBuffer = (id:string) => useSyncExternalStore(subscribeRxLineBufferBuilder(id), getRxLineBufferBuilder(id))
+export const getRxLineBuffers = (id:number, page:number,perPage:number) => {
+    if (id < rxLineBuffers.length) {
+        const buff = rxLineBuffers[id].get()
+        const len = buff.length
+        const startIndex = Math.min(page * perPage, len)
+        const endIndex = Math.min((page + 1) * perPage, len)
+        const pageInfo = {
+            hasPreviousPage: 0 < startIndex,
+            hasNextPage: endIndex < len
+        }        
+        return { data:buff.slice(startIndex, endIndex), total:buff.length, pageInfo}
+    } else {
+        return { data:[], total:0}
+    }
+}
 
 const getLastRxLineBuilder = (id:string) => ()=>webSerialPorts.getPortById(id).rx
 const subscribeLastRxLineBuilder = (id:string) => (callback:any) => {

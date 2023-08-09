@@ -5,6 +5,7 @@ import { useGetRecordId } from 'react-admin'
 import webSerialPorts from '../../webSerialDataProvider/src/webSerialPorts'
 import {useIsOpen } from '../../webSerialDataProvider/src/webSerialDataProvider'
 import RxTerminal from './RxTerminal';
+import {SerialPortsDataList} from './SerialPortDataList'
 
 const PortDeleteButton = (props:any) => {
 	const recordId = useGetRecordId()
@@ -112,6 +113,7 @@ const Title = () => {
 };
 
 export const SerialPortEdit = () => {
+	const recordId = useGetRecordId()
     return (
         <Show
             actions={<Actions />}
@@ -120,8 +122,9 @@ export const SerialPortEdit = () => {
             emptyWhileLoading
         >
             <SimpleShowLayout>
-                <RxTerminal></RxTerminal>
+                <SerialPortsDataList id={recordId}></SerialPortsDataList>
             </SimpleShowLayout>
         </Show>
     );
 }
+//                 <RxTerminal></RxTerminal>

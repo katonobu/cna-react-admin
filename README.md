@@ -1,11 +1,52 @@
 # 状況
 - 現状の課題
-  - データ蓄積はDataProviderとwebSerialPorts.tsの間に持っていきたい。
+  - webSerialDataPorts.tsで文字列変換、改行コード分割処理を入れている。
+    - callbackでbinaryデータ、文字列データのいずれでも扱えるようにする。
+  - webSerialDataPorts.tsで状態管理実装が2系統ある。
+    - MicroStoreに統一する。
+
+  - データ蓄積と表示方法の改善
     - SerialPortEdit.tsxでは表示に必要な行数分だけ保持している。
-    - 過去の履歴も保持するデータストアに対して、最後の指定行を取り出す、というI/Fがよさそう。
+    - dataProviderのデータ側に起動後からのデータを蓄積
+      - infinit pagenationで常に最新のを表示させ、古いのもさかのぼれるようにするのがいいかも。
+      - 検索とかもできだし
+      - タイムスタンプつけても便利そう
+
   - スマホサイズの画面にすると右側のボタンが見えなくなる。
-  - リストからのデバイス選択/削除で、削除が実行されるが、実際には削除されない。
-  
+    - Shwoは未解決
+ 
+- 全体アーキテクチャ見直し
+  - layerと依存/前提
+    - webSerialDataPorts.ts : vanilla
+      - webSerialDataPorts.ts をまたぐsubscribe-callbackによる受信データ伝送は、receive関数のcallbackとする。
+      - バイナリ文字列変換、パケッタイズは上位で行い、この階層ではひたすらrx-publishを行う
+
+    - webSerialDataParser.ts : vanilla
+      - 連続したバイナリデータに対して、要求に応じてバイナリ文字列変換、パケッタイズを行う。
+        - subscibe/publish I/Fとする。
+          - newLine文字列パーサー
+          - SWVパーサー
+          - cmd/rsp/evtパーサー(CXM150x)
+          - cmd/rsp/evtパーサー(BCX)
+
+    - webSerialDataProvider.ts : react + reqct-query
+      - レコード長固定バイナリデータのcmd/rsp(BCX-FW Update,TX-FW Update)
+        - cmdは送信完了Promiseとして見せる
+        - rspは長さ指定read
+      - ストリーミングバイナリデータの受信/パース(SWV)
+        - パース後データをuseSyncExternalStoreによるhookとして見せる
+      - 文字列データ/改行コードによる行分割(CXM150x/BCX)
+        - 改行分割後の受信データはuseSyncExternalStoreによるhookとして見せる
+        - cmd/rspはreqct-queryで使えるPromiseとして見せる
+        - evtはuseSyncExternalStoreによるhookとして見せる
+
+- 検証
+  - webSerialDataPorts.ts のブラッシュアップ/検証
+  - webSerialDataProvider.ts の検証はwebSerialDataPorts.tsのモックでnodeでやる?
+
+
+
+
 
 - 解決した課題
   - Edit画面で、シリアルの送受信表示
@@ -51,12 +92,22 @@
     - 最終的にはbinaryも扱えるようにしたい。
 
   - htmlでは先頭空白、空行が無視される
-    - <pre>で括った
+    - `<pre>`で括った
 
   - 表示行数をpropsで指定できるようにした。
 
   - record.idの値がすぐに取れない、suspensとか使うとうまくいく??
-    - useGetRecordId()ならすぐに取れる。
+    - [useGetRecordId()](https://marmelab.com/react-admin/useGetRecordId.html)ならすぐに取れる。
+
 
   - 左側のリスト、Webserialportsのアイコンはリストアイコンにして登録済デバイスも表示させたほうがいいか。
     - カスタムMenuで、Port増減をトリガとしてMenu再生成するようにした
+      - [Menu](https://marmelab.com/react-admin/Menu.html)
+
+  - リストからのデバイス選択/削除で、削除が実行されるが、実際には削除されない。
+    - Listページの`Datagrid`コンポーネントの`isRowSelectable`プロパティーに`={ record => (record.isOpen === 'Close') }`を設定した
+      - [isrowselectable](https://marmelab.com/react-admin/Datagrid.html#isrowselectable)
+    - ListページでCloseのデバイスしかBulkAction対象に選択できなくなった。
+
+  - スマホサイズの画面にすると右側のボタンが見えなくなる。
+    - Listは、https://marmelab.com/react-admin/ListTutorial.html#responsive-lists を参考にして解決
