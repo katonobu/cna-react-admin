@@ -11,9 +11,6 @@ import {SerialPortsList} from '@/app/serialPorts/src/SerialPortList'
 import {SerialPortEdit} from '@/app/serialPorts/src/SerialPortEdit'
 
 
-const AdminContext = dynamic(() => import('react-admin').then((module)=>module.AdminContext), {
-  ssr: false, // サーバーサイドレンダリングを無効化
-});
 const Admin = dynamic(() => import('react-admin').then((module)=>module.Admin), {
   ssr: false, // サーバーサイドレンダリングを無効化
 });
