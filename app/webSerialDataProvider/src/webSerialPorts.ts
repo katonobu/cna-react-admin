@@ -411,13 +411,15 @@ export default (() => {
   }
 
   let portObjs: WebSerialPort[] = [];
-  if (typeof window !== 'undefined') {
-  //  addWebSerialStore(null);
-    navigator.serial
-      .getPorts()
-      .then((ports) =>{
-        ports.forEach((port:SerialPort) => addWebSerialStore(port))
-      });
+  if (typeof window !== 'undefined'){
+    // ブラウザ環境
+    if ("serial" in navigator) {    
+      // web serialが有効なブラウザ/バージョン
+      navigator.serial
+        .getPorts()
+        .then((ports) =>{
+          ports.forEach((port:SerialPort) => addWebSerialStore(port))
+        });
       navigator.serial.addEventListener('connect', (event: Event) =>{
         const port:SerialPort | null = event.target as SerialPort;
         if(port) {
@@ -434,11 +436,12 @@ export default (() => {
           // ToDo:イベント発火したけどportに値が入っていない。
         }
       });
+    }
   }    
   const create = async (
     requestPortFilters: SerialPortRequestOptions
   ): Promise<WebSerialPort> => {
-    if (typeof window !== 'undefined') {    
+    if (typeof window !== 'undefined' && "serial" in navigator) {    
       try {
         const port:SerialPort = await navigator.serial.requestPort(requestPortFilters);
         return addWebSerialStore(port);

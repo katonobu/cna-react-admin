@@ -31,25 +31,41 @@ const ListActions = () => (
 )
 
 // 全デバイスが削除されたときの表示ページ
+// ユーザーが初めてページを訪れたときは、このページが表示される。
+// WebSerial-APIサポート有無チェックしてサポートしてないときはcreateを効かせない。
 const Empty = () => {
     const [create] = useCreate('webserialport', {});
-    const portLen = useSerialPortLen()    
+    const portLen = useSerialPortLen()
+    const available = (typeof window !== 'undefined' && "serial" in navigator)
     useEffect(()=>{
-        if (portLen === 0) {
+        if (portLen === 0 && available) {
             create()
         }
-    },[create, portLen]);
-    return (
-        <Box textAlign="center" m={1}>
-            <Typography variant="h4" paragraph>
-                No registrated serialport available
-            </Typography>
-            <Typography variant="body1">
-                Select / Add one 
-            </Typography>
-            <AttachButton disable_not_empty={true}/>
-        </Box>
-    )
+    },[create, portLen, available]);
+    if (available){
+        return (
+            <Box textAlign="center" m={1}>
+                <Typography variant="h4" paragraph>
+                    No registrated serialport available
+                </Typography>
+                <Typography variant="body1">
+                    Select / Add one 
+                </Typography>
+                <AttachButton disable_not_empty={true}/>
+            </Box>
+        )
+    } else {
+        return (
+            <Box textAlign="center" m={1}>
+                <Typography variant="h4" paragraph>
+                This page uses WebSerial-API.
+                </Typography>
+                <Typography variant="h5" paragraph>
+                But your browser dosen't support it.                
+                </Typography>
+            </Box>
+        )
+    }
 }
 
 
