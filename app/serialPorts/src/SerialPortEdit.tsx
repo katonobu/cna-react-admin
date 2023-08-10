@@ -1,11 +1,13 @@
 import { useState } from 'react'
-import { Show, SimpleShowLayout, Button} from 'react-admin';
+import { Show, SimpleShowLayout/*, Button*/} from 'react-admin';
 import { DeleteButton, TopToolbar, ListButton, useRecordContext } from 'react-admin';
 import { useGetRecordId } from 'react-admin'
 import webSerialPorts from '../../webSerialDataProvider/src/webSerialPorts'
 import {useIsOpen } from '../../webSerialDataProvider/src/webSerialDataProvider'
-import RxTerminal from './RxTerminal';
-import {SerialPortsDataList} from './SerialPortDataList'
+import { useMediaQuery, Button } from '@mui/material';
+import { SerialPortsDataList} from './SerialPortDataList'
+import OpenInFullIcon from '@mui/icons-material/OpenInFull';
+import CloseFullscreenIcon from '@mui/icons-material/CloseFullscreen';
 
 const PortDeleteButton = (props:any) => {
 	const recordId = useGetRecordId()
@@ -20,32 +22,28 @@ const SendButton = ()=>{
     const isOpen = useIsOpen(recordId.toString(10))
     return (
         <Button
-            label="SEND"
-            color="primary"
             disabled={!isOpen}
             onClick={()=>{
                 const port = webSerialPorts.getPortById(recordId)
                 port.send(new TextEncoder().encode("Hello world\n"))
             }}
-        ></Button>        
+        >
+            SEND            
+        </Button>        
     )
 }
+
+// https://github.com/marmelab/react-admin/blob/master/packages/ra-ui-materialui/src/button/ListButton.tsx
+// によれば、単にButtonの子要素にアイコンを指定しているだけ
 const OpenCloseButton = ()=> {
 	const recordId = useGetRecordId()
     const port = webSerialPorts.getPortById(recordId)
     const isOpen = useIsOpen(recordId.toString(10))
     const [disabled, setDisabled] = useState(false)
-    let buttonText = ""
-    if (isOpen) {
-        buttonText = "Close Port"
-    } else {
-        buttonText = "Open Port"
-    }
+    const isSmall = useMediaQuery((theme:any) => theme.breakpoints.down('sm'));    
     return (
         <Button
             disabled = {disabled}
-            label={buttonText}
-            color="primary"
             onClick={()=>{
                 if (isOpen) {
                     setDisabled(true)
@@ -69,8 +67,11 @@ const OpenCloseButton = ()=> {
                     })
                 }
             }}
-            sx={{ width: '9em' }}
-        ></Button>        
+            sx={{ width: isSmall?'24px':'10em' }}
+        >
+            {isOpen?<CloseFullscreenIcon/>:<OpenInFullIcon/>}
+            {isSmall?<></>:isOpen?"Close Port":"Open Port"}
+        </Button>        
     )
 }
 
@@ -114,10 +115,11 @@ const Title = () => {
 
 export const SerialPortEdit = () => {
 	const recordId = useGetRecordId()
+    const isSmall = useMediaQuery((theme:any) => theme.breakpoints.down('sm'));    
     return (
         <Show
             actions={<Actions />}
-            aside={<Aside />}    
+            aside={isSmall?<></>:<Aside />}    
             title={<Title />}
             emptyWhileLoading
         >
@@ -127,4 +129,3 @@ export const SerialPortEdit = () => {
         </Show>
     );
 }
-//                 <RxTerminal></RxTerminal>
