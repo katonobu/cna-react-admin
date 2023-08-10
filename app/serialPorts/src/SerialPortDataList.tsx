@@ -1,12 +1,9 @@
 import { useRef, useEffect} from 'react'
 import { useInfiniteGetList} from 'react-admin';
 import { List, ListItem, ListItemText } from '@mui/material';
+import { Typography, useMediaQuery } from '@mui/material';
 import { useRxLineBuffer } from '../../webSerialDataProvider/src/webSerialDataProvider'
 import { useQueryClient } from 'react-query'
-
-const ExtractText = ({rxData}:{rxData:any}) => {
-    return (new Date(rxData.ts)).toLocaleString() + "  " + rxData.data
-}
 
 export const InvalidateIfDataUpdated = ({fetchInfo}:any) => {
     const {total, hasNextPage, portIdStr} = fetchInfo
@@ -15,6 +12,7 @@ export const InvalidateIfDataUpdated = ({fetchInfo}:any) => {
     if ((total && total < totalLines && hasNextPage === false) ||
         (total === undefined && 0 < totalLines)){
 //        console.log("-----")
+        // 本当は最後のページだけinvalidateさせたい。。。
         queryClient.invalidateQueries({ queryKey: ['Port_Rx_Data']})
     } else {
 //        console.log("-----", total, totalLines, hasNextPage)
@@ -51,6 +49,7 @@ export const SerialPortsDataList = (props:any) => {
     const fetchInfo = {
         total, hasNextPage, portIdStr:id
     }
+    const isSmall = useMediaQuery((theme:any) => theme.breakpoints.down('sm'));    
     return (
         <>
             <InvalidateIfDataUpdated fetchInfo={fetchInfo}></InvalidateIfDataUpdated>
@@ -59,9 +58,20 @@ export const SerialPortsDataList = (props:any) => {
                     {data?.pages.map(page => {
                         return page.data.map(eleData => (
                             <ListItem disablePadding key={eleData.id}>
-                                <ListItemText>
-                                    <ExtractText rxData={eleData}></ExtractText>
-                                </ListItemText>
+                                <ListItemText
+                                    style={{ margin: '0', padding: '0' }}
+                                    disableTypography
+                                    primary={
+                                        <Typography style={{ margin: '0', padding: '0' }}>
+                                            {isSmall?null:(<span style={{ fontFamily: 'Monospace', margin: '0', padding: '0' }}>
+                                                {(new Date(eleData.ts)).toLocaleString() + "." + (eleData.ts%1000).toString(10).padStart(3,'0') + " : "}
+                                            </span>)}
+                                            <span style={{ fontFamily: 'Monospace', margin: '0', padding: '0', fontWeight: 'bold'}}>
+                                                {eleData.data}
+                                            </span>
+                                        </Typography>
+                                    }
+                                />
                             </ListItem>
                         ));
                     })}
