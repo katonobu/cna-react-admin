@@ -5,8 +5,11 @@ import { Box, Typography, useMediaQuery } from '@mui/material';
 import {useEffect} from 'react'
 import {useSerialPortLen, subscribeSerialPortLen} from '../../webSerialDataProvider/src/webSerialDataProvider'
 
-const AttachButton = (props:{disable_not_empty?:boolean}) => {
-    const {disable_not_empty = false} = props
+const AttachButton = (props:{
+        disable_not_empty?:boolean, 
+        variant?:"text" | "outlined" | "contained" | undefined
+    }) => {
+    const {disable_not_empty = false, variant='text'} = props
     const portLen = useSerialPortLen()
     const [create, { isLoading }] = useCreate('webserialport', {});
     return (
@@ -15,6 +18,7 @@ const AttachButton = (props:{disable_not_empty?:boolean}) => {
             onClick={
                 () => create()
             }
+            variant={variant}
             disabled={isLoading || (disable_not_empty && 0 < portLen)}
         >
             <AddIcon/>
@@ -36,7 +40,7 @@ const ListActions = () => (
 const Empty = () => {
     const [create] = useCreate('webserialport', {});
     const portLen = useSerialPortLen()
-    const available = (typeof window !== 'undefined' && "serial" in navigator)
+    const available = (typeof window !== 'undefined' && "serial" in navigator)// && false
     useEffect(()=>{
         if (portLen === 0 && available) {
             create()
@@ -48,10 +52,10 @@ const Empty = () => {
                 <Typography variant="h4" paragraph>
                     No registrated serialport available
                 </Typography>
-                <Typography variant="body1">
-                    Select / Add one 
+                <Typography variant="h5">
+                    Select / Add to start.
                 </Typography>
-                <AttachButton disable_not_empty={true}/>
+                <AttachButton disable_not_empty={true} variant="outlined"/>
             </Box>
         )
     } else {
@@ -61,7 +65,7 @@ const Empty = () => {
                 This page uses WebSerial-API.
                 </Typography>
                 <Typography variant="h5" paragraph>
-                But your browser dosen't support it.                
+                But your browser dosen&apos;t support it.                
                 </Typography>
             </Box>
         )
