@@ -39,14 +39,13 @@ const MyLayout = (props:any) => <Layout {...props} menu={MyMenu} />
 
 const serialDataProvider = webSerialProvider();
 const AppRoot = () => {
-    /*
-    // ここでworkerを起動
+    // https://blog.logrocket.com/web-workers-react-typescript/
+    // を参考に、ここでworkerを起動
     // dynamic-loadingコンポーネント内で起動しないと、サーバー側でworkerを起動しようとする
     const worker: Worker = useMemo(
         () => new Worker(new URL("./worker/src/index.ts", import.meta.url)),
         []
     );
-    */
     return (
         <Admin
           dataProvider={serialDataProvider}
