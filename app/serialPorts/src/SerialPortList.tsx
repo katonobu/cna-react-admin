@@ -37,14 +37,7 @@ const ListActions = () => (
 // ユーザーが初めてページを訪れたときは、このページが表示される。
 // WebSerial-APIサポート有無チェックしてサポートしてないときはcreateを効かせない。
 const Empty = () => {
-    const [create] = useCreate('webserialport', {});
-    const portLen = useSerialPortLen()
     const available = (typeof window !== 'undefined' && "serial" in navigator)// && false
-    useEffect(()=>{
-        if (portLen === 0 && available) {
-            create()
-        }
-    },[create, portLen, available]);
     if (available){
         return (
             <Box textAlign="center" m={1}>
