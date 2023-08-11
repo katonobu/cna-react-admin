@@ -438,16 +438,27 @@ export default (() => {
       });
     }
   }    
-  const create = async (
+  const onCreate = async (
     requestPortFilters: SerialPortRequestOptions
-  ): Promise<WebSerialPort> => {
-    if (typeof window !== 'undefined' && "serial" in navigator) {    
+  ): Promise<WebSerialPort | null> => {
+    if (typeof window !== 'undefined' && "serial" in navigator) { 
+      let retVal = null   
       try {
-        const port:SerialPort = await navigator.serial.requestPort(requestPortFilters);
-        return addWebSerialStore(port);
+        const currentPorts:SerialPort[] = await navigator.serial.getPorts()
+        const newPorts:SerialPort[] = currentPorts.filter((port)=>internalMap.get(port) === undefined)
+        if (newPorts.length === 0){
+          // Maybe select already registrated port
+        } else if (newPorts.length === 1){
+          // select one new port registrated port
+          retVal = addWebSerialStore(newPorts[0]);
+        } else {
+          // more than one new port.
+          console.log("More than one port may added, unexpected")
+        }
       } catch (e) {
         throw e
       }
+      return retVal
     } else {
       return new WebSerialPort(null)
     }
@@ -475,7 +486,7 @@ export default (() => {
   return {
     getPorts,
     subscribe,
-    create,
+    onCreate,
     getPortById,
     getMaxId:()=>WebSerialPort.idCount
   };

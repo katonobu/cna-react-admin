@@ -2,7 +2,7 @@ import { DataProvider } from 'ra-core';
 import { CreateResult, DeleteResult, DeleteManyResult, GetListResult, GetManyReferenceResult, GetManyResult, GetOneResult, UpdateManyResult, UpdateResult } from 'react-admin';
     
 import webSerialPorts from './webSerialPorts';
-import {getRxLineBuffers} from './webSerialDataProvider'
+import {getRxLineBuffers} from './webSerialDataBuffer'
 
 const webSerialProvider = (): DataProvider => {
     console.log("webSerialProvider init.")
@@ -96,19 +96,23 @@ const webSerialProvider = (): DataProvider => {
         },
 
         create: (resource, params) => {
-            return webSerialPorts.create({}).then((wsp)=> {
-                return {data:serializeWebSerialPort(wsp)} as CreateResult
-            }).catch((e)=>{
-                if (
-                    e.code === 8 || // Failed to execute 'requestPort' on 'Serial': No port selected by the user.
-                    e.code === 18   // Failed to execute 'requestPort' on 'Serial': Must be handling a user gesture to show a permission request.
-                ){
-//                    return {data:{} as RecordType} // これだとエラーになるのでrejctedPromiseを返す。
+            return navigator.serial.requestPort({})
+            .then((port)=>{
+                return webSerialPorts.onCreate({}).then((wsp)=> {
+                    if (wsp) {
+                        return {data:serializeWebSerialPort(wsp)} as CreateResult
+                    } else {
+                        // may selected already registrated port.
+                        throw new Error('Select already registrated')
+                    }
+                }).catch((e)=>{
                     return Promise.reject(e)
-                } else {
-                    return Promise.reject(e)
-                }
+                })
             })
+            .catch((e)=>{
+                return Promise.reject(e)
+            })
+
         },
 
         delete: (resource, params) => {
