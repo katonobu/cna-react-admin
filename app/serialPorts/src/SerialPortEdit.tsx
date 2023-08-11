@@ -2,8 +2,7 @@ import { useState } from 'react'
 import { Show, SimpleShowLayout/*, Button*/} from 'react-admin';
 import { DeleteButton, TopToolbar, ListButton, useRecordContext } from 'react-admin';
 import { useGetRecordId } from 'react-admin'
-import webSerialPorts from '../../webSerialDataProvider/src/webSerialPorts'
-import {useIsOpen } from '../../webSerialDataProvider/src/webSerialDataProvider'
+import { useOpen, useClose, useSend, useReceieve, useIsOpen } from '../../webSerialDataProvider/src/webSerialDataProvider'
 import { useMediaQuery, Button } from '@mui/material';
 import { SerialPortsDataList} from './SerialPortDataList'
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
@@ -20,13 +19,11 @@ const PortDeleteButton = (props:any) => {
 const SendButton = ()=>{
 	const recordId = useGetRecordId()
     const isOpen = useIsOpen(recordId.toString(10))
+    const sendData = useSend(recordId.toString(10))
     return (
         <Button
             disabled={!isOpen}
-            onClick={()=>{
-                const port = webSerialPorts.getPortById(recordId)
-                port.send(new TextEncoder().encode("Hello world\n"))
-            }}
+            onClick={()=>sendData(new TextEncoder().encode("Hello world\n"))}
         >
             SEND            
         </Button>        
@@ -37,7 +34,9 @@ const SendButton = ()=>{
 // によれば、単にButtonの子要素にアイコンを指定しているだけ
 const OpenCloseButton = ()=> {
 	const recordId = useGetRecordId()
-    const port = webSerialPorts.getPortById(recordId)
+    const open = useOpen(recordId.toString(10))
+    const close = useClose(recordId.toString(10))
+    const receive = useReceieve(recordId.toString(10))
     const isOpen = useIsOpen(recordId.toString(10))
     const [disabled, setDisabled] = useState(false)
     const isSmall = useMediaQuery((theme:any) => theme.breakpoints.down('sm'));    
@@ -47,7 +46,7 @@ const OpenCloseButton = ()=> {
             onClick={()=>{
                 if (isOpen) {
                     setDisabled(true)
-                    port.close()
+                    close()
                     .then((errStr)=>{
                         if (errStr) {
                             console.error(errStr)
@@ -56,12 +55,12 @@ const OpenCloseButton = ()=> {
                     })
                 } else {
                     setDisabled(true)
-                    port.open({baudRate:115200})
+                    open({baudRate:115200})
                     .then((errStr)=>{
                         if (errStr) {
                             console.error(errStr)
                         } else {
-                            port.receive(0,0)
+                            receive(0,0)
                         }
                         setDisabled(false)
                     })
@@ -92,14 +91,13 @@ const Actions = () => (
 // 画面右側の表示
 const Aside = () => {
 	const recordId = useGetRecordId()
-    const isOpen = useIsOpen(recordId.toString(10))
     const record = useRecordContext();
-    if(record && 'venderName' in record){
+    if(record && 'venderName' in record && 'isOpen' in record){
         return (
             <ul style={{ width: 200, margin: '1em' }}>
                 <li style={{listStyle: 'none'}}>ID:{recordId}</li>
                 <li style={{listStyle: 'none'}}>Name:{record.venderName}</li>
-                <li style={{listStyle: 'none'}}>Open:{isOpen.toString()}</li>
+                <li style={{listStyle: 'none'}}>Open:{(record.isOpen==='Open').toString()}</li>
             </ul>
         );
     } else {

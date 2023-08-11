@@ -2,20 +2,13 @@ import {useSyncExternalStore} from 'react'
 import webSerialPorts from './webSerialPorts';
 import { subscribeRxBufferLineBuilder, getRxBufferLineBuilder } from './webSerialDataBuffer';
 
-// useSerialPortLen
-const getSerialPortLen = () =>webSerialPorts.getPorts().length
-export const subscribeSerialPortLen = (callback:any) => {
+// useSerialPorts
+const getSerialPorts = () =>webSerialPorts.getPorts()
+export const subscribeSerialPorts = (callback:any) => {
     const unsubscribe = webSerialPorts.subscribe(callback)
     return ()=>unsubscribe()
 }
-export const useSerialPortLen = () => useSyncExternalStore(subscribeSerialPortLen, getSerialPortLen)
-
-// useSerialPorts
-const getSerialPorts = () =>webSerialPorts.getPorts()
-export const useSerialPorts = () => useSyncExternalStore(subscribeSerialPortLen, getSerialPorts)
-
-// useRxLineBuffer
-export const useRxBufferLen = (id:string) => useSyncExternalStore(subscribeRxBufferLineBuilder(id), getRxBufferLineBuilder(id))
+export const useSerialPorts = () => useSyncExternalStore(subscribeSerialPorts, getSerialPorts)
 
 // useLastRxLine
 const getLastRxLineBuilder = (id:string) => ()=>webSerialPorts.getPortById(id).rx
@@ -33,5 +26,34 @@ const subscribeIsOpenBuilder = (id:string) => (callback:any) => {
 }
 export const useIsOpen = (id:string) => useSyncExternalStore(subscribeIsOpenBuilder(id), getIsOpenBuilder(id))
 
+// useRxBufferLen
+export const useRxBufferLen = (id:string) => useSyncExternalStore(subscribeRxBufferLineBuilder(id), getRxBufferLineBuilder(id))
 
+// useSend
+export const useSend = (id:string) => {
+    return (data:Uint8Array):Promise<string> => {
+        const port = webSerialPorts.getPortById(id)
+        return port.send(data)
+    }
+}
 
+export const useOpen = (id:string) => {
+    return (options: SerialOptions): Promise<string> => {
+        const port = webSerialPorts.getPortById(id)
+        return port.open(options)
+    }
+}
+
+export const useClose = (id:string) => {
+    return (): Promise<string> => {
+        const port = webSerialPorts.getPortById(id)
+        return port.close()
+    }
+}
+
+export const useReceieve = (id:string) => {
+    return (byteLength: number, timeoutMs: number, newLineCode?: string | RegExp): Promise<any> => {
+        const port = webSerialPorts.getPortById(id)
+        return port.receive(byteLength, timeoutMs, newLineCode)
+    }
+}

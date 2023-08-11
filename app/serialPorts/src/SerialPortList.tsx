@@ -1,16 +1,15 @@
 import { Datagrid, List, TextField, Button, TopToolbar, SimpleList} from 'react-admin';
-import { useCreate, useRefresh} from 'react-admin';
+import { useCreate} from 'react-admin';
 import AddIcon from '@mui/icons-material/Add';
 import { Box, Typography, useMediaQuery } from '@mui/material';
-import {useEffect} from 'react'
-import {useSerialPortLen, subscribeSerialPortLen} from '../../webSerialDataProvider/src/webSerialDataProvider'
+import {useSerialPorts} from '../../webSerialDataProvider/src/webSerialDataProvider'
 
 const AttachButton = (props:{
         disable_not_empty?:boolean, 
         variant?:"text" | "outlined" | "contained" | undefined
     }) => {
     const {disable_not_empty = false, variant='text'} = props
-    const portLen = useSerialPortLen()
+    const serialPorts = useSerialPorts()
     const [create, { isLoading }] = useCreate('webserialport', {});
     return (
         <Button
@@ -19,7 +18,7 @@ const AttachButton = (props:{
                 () => create()
             }
             variant={variant}
-            disabled={isLoading || (disable_not_empty && 0 < portLen)}
+            disabled={isLoading || (disable_not_empty && 0 < serialPorts.length)}
         >
             <AddIcon/>
         </Button>
@@ -68,14 +67,7 @@ const Empty = () => {
 // レスポンシブ対応は https://marmelab.com/react-admin/ListTutorial.html#responsive-lists より引用
 // バルク選択 enable/disable制御は https://marmelab.com/react-admin/Datagrid.html#isrowselectable より引用
 export const SerialPortsList = () => {
-    const refresh = useRefresh();
     const isSmall = useMediaQuery((theme:any) => theme.breakpoints.down('sm'));    
-    useEffect(()=>{
-        const unsubscribe = subscribeSerialPortLen(refresh)
-        return (()=>{
-            unsubscribe();
-        })
-    },[refresh])
     return (
         <List
             empty={<Empty />}        

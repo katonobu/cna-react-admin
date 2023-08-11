@@ -6,15 +6,6 @@ import {getRxLineBuffers} from './webSerialDataBuffer'
 
 const webSerialProvider = (): DataProvider => {
     console.log("webSerialProvider init.")
-    const trueFalseNullToString = (obj:boolean | undefined | null):string => {
-        if (obj === true) {
-            return 'True'
-        } else if (obj == false) {
-            return 'False'
-        } else {
-            return 'N.A.'
-        }
-    };
     const serializeWebSerialPort = (wsp:any):Object => {
 //        console.log(wsp);
         return {
