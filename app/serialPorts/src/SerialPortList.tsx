@@ -1,4 +1,4 @@
-import { Datagrid, List, TextField, Button, TopToolbar, ExportButton, SimpleList} from 'react-admin';
+import { Datagrid, List, TextField, Button, TopToolbar, SimpleList} from 'react-admin';
 import { useCreate, useRefresh} from 'react-admin';
 import AddIcon from '@mui/icons-material/Add';
 import { Box, Typography, useMediaQuery } from '@mui/material';
@@ -30,7 +30,6 @@ const AttachButton = (props:{
 const ListActions = () => (
     <TopToolbar>
         <AttachButton/>
-        <ExportButton/>
     </TopToolbar>    
 )
 
