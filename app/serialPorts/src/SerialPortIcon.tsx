@@ -71,7 +71,7 @@ const SerialPortIcon = (props:any) => {
                   L  20,     9
                   L  12,     9
                   z"
-            stroke-width="0"/>
+            strokeWidth="0"/>
          {[6,9,12,15,18].map((x)=>(
             <circle
                cx={x.toString(10)}
