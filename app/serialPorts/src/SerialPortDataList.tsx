@@ -2,12 +2,12 @@ import { useRef, useEffect} from 'react'
 import { useInfiniteGetList} from 'react-admin';
 import { List, ListItem, ListItemText } from '@mui/material';
 import { Typography, useMediaQuery } from '@mui/material';
-import { useRxLineBuffer } from '../../webSerialDataProvider/src/webSerialDataProvider'
+import { useRxBufferLen } from '../../webSerialDataProvider/src/webSerialDataProvider'
 import { useQueryClient } from 'react-query'
 
 export const InvalidateIfDataUpdated = ({fetchInfo}:any) => {
     const {total, hasNextPage, portIdStr} = fetchInfo
-    const {totalLines} = useRxLineBuffer(portIdStr)
+    const {totalLines} = useRxBufferLen(portIdStr)
     const queryClient = useQueryClient()
     if ((total && total < totalLines && hasNextPage === false) ||
         (total === undefined && 0 < totalLines)){
