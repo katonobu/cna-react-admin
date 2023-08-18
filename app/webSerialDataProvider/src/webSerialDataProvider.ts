@@ -45,48 +45,41 @@ export const useRxBufferLen = (id:string) => useSyncExternalStore(subscribeLineN
 
 //interface responseType
 
-export const useGetPorts = () => {
-    return (): Promise<any> => {
-        return fetchSerial("/ports", {method:'GET'})
-        .then((rsp)=>{
-            if ('error' in rsp) {
-                return Promise.reject(rsp.error as string)
-            } else {
-                return rsp.data
-            }
-        })
-        .catch((e)=>(Promise.reject(e)))
-    }
+export const getPorts = () => {
+    return fetchSerial("/ports", {method:'GET'})
+    .then((rsp)=>{
+        if ('error' in rsp) {
+            return Promise.reject(rsp.error as string)
+        } else {
+            return rsp.data
+        }
+    })
+    .catch((e)=>(Promise.reject(e)))
 }
 
-export const useCreate = () => {
-    return (): Promise<any> => {
-        return fetchSerial("/ports", {method:'PATCH'})
-        .then((rsp)=>{
-            if ('error' in rsp) {
-                return Promise.reject(rsp.error as string)
-            } else {
-                return rsp.data
-            }
-        })
-        .catch((e)=>(Promise.reject(e)))
-    }
+export const createPort = () => {
+    return fetchSerial("/ports", {method:'PATCH'})
+    .then((rsp)=>{
+        if ('error' in rsp) {
+            return Promise.reject(rsp.error as string)
+        } else {
+            return rsp.data
+        }
+    })
+    .catch((e)=>(Promise.reject(e)))
 }
 
-export const useGetPort = () => {
-    return (id:string): Promise<any> => {
-        return fetchSerial("/ports/"+id, {method:'GET'})
-        .then((rsp)=>{
-            if ('error' in rsp) {
-                return Promise.reject(rsp.error as string)
-            } else {
-                return rsp.data
-            }
-        })
-        .catch((e)=>(Promise.reject(e)))
-    }
+export const getPort = (id:string): Promise<any> => {
+    return fetchSerial("/ports/"+id, {method:'GET'})
+    .then((rsp)=>{
+        if ('error' in rsp) {
+            return Promise.reject(rsp.error as string)
+        } else {
+            return rsp.data
+        }
+    })
+    .catch((e)=>(Promise.reject(e)))
 }
-
 export const useOpen = (id:string) => {
     return (options: SerialOptions): Promise<string> => {
         return fetchSerial("/ports/"+id+"/open", {method:'POST', body:{options}})
@@ -129,19 +122,17 @@ export const useReceieve = (id:string) => {
     }
 }
 
-export const useGetPage = () => {
-    return (id:string, page:number, perPage:number) => {
-        const body = {id, page, perPage}
-        return fetchSerial("/ports/"+id + "/rxdata", {method:'GET', body})
-        .then((rsp)=>{
-            if ('error' in rsp) {
-                return Promise.reject(rsp.error as string)
-            } else {
-                return rsp.data
-            }
-        })
-        .catch((e)=>(Promise.reject(e)))
-    }
+export const getPage = (id:string, page:number, perPage:number) => {
+    const body = {id, page, perPage}
+    return fetchSerial("/ports/"+id + "/rxdata", {method:'GET', body})
+    .then((rsp)=>{
+        if ('error' in rsp) {
+            return Promise.reject(rsp.error as string)
+        } else {
+            return rsp.data
+        }
+    })
+    .catch((e)=>(Promise.reject(e)))
 }
 
 export const useClose = (id:string) => {
@@ -158,17 +149,21 @@ export const useClose = (id:string) => {
     }
 }
 
-export const useDelete = () => {
-    return (id:string): Promise<string> => {
-        console.log("useDelete","/ports/"+id)
-        return fetchSerial("/ports/"+id, {method:'DELETE'})
-        .then((rsp)=>{
-            if ('error' in rsp) {
-                return Promise.reject(rsp.error as string)
-            } else {
-                return ""
-            }
-        })
-        .catch((e)=>(Promise.reject(e)))
-    }
+export const deletePort = (id:string): Promise<string> => {
+    console.log("useDelete","/ports/"+id)
+    return fetchSerial("/ports/"+id, {method:'DELETE'})
+    .then((rsp)=>{
+        if ('error' in rsp) {
+            return Promise.reject(rsp.error as string)
+        } else {
+            return ""
+        }
+    })
+    .catch((e)=>(Promise.reject(e)))
 }
+
+export const useGetPorts = ()=>getPorts
+export const useCreate   = ()=>createPort
+export const useGetPort  = ()=>getPort
+export const useGetPage  = ()=>getPage
+export const useDelete   = ()=>deletePort

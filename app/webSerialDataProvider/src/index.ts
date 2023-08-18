@@ -1,6 +1,6 @@
 import { DataProvider } from 'ra-core';
 import { CreateResult, DeleteResult, DeleteManyResult, GetListResult, GetOneResult } from 'react-admin';
-import { useGetPorts, useGetPort, useCreate, useDelete, useGetPage } from '@/app/webSerialDataProvider/src/webSerialDataProvider';
+import { getPorts, createPort, getPort, deletePort, getPage } from '@/app/webSerialDataProvider/src/webSerialDataProvider';
 
 const webSerialProvider = (): DataProvider => {
     console.log("webSerialProvider init.")
@@ -14,11 +14,6 @@ const webSerialProvider = (): DataProvider => {
             isOpen:wsp.isOpen?'Open':'Close',
         }
     };
-    const getPorts = useGetPorts()
-    const getPort = useGetPort()
-    const createPort = useCreate()
-    const deletePort = useDelete()
-    const getPage = useGetPage()
     return {
         getList: (resource, params) => {
             if (resource === 'List_Add_Port') {
