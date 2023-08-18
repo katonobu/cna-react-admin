@@ -62,7 +62,7 @@ export const SerialPortsDataList = (props:any) => {
                                     style={{ margin: '0', padding: '0' }}
                                     disableTypography
                                     primary={
-                                        <Typography style={{ margin: '0', padding: '0' }}>
+                                        <Typography style={{ margin: '0', padding: '0', whiteSpace: 'pre' }}>
                                             {isSmall?null:(<span style={{ fontFamily: 'Monospace', margin: '0', padding: '0' }}>
                                                 {(new Date(eleData.ts)).toLocaleString() + "." + (eleData.ts%1000).toString(10).padStart(3,'0') + " : "}
                                             </span>)}
