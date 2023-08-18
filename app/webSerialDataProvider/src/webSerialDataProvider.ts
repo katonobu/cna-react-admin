@@ -165,7 +165,6 @@ export const useClose = (id:string) => {
 }
 
 export const deletePort = (id:string): Promise<string> => {
-    console.log("useDelete","/ports/"+id)
     return fetchSerial("/ports/"+id, {method:'DELETE'})
     .then((rsp)=>{
         if ('error' in rsp) {

@@ -404,7 +404,7 @@ export default (() => {
       internalMap.set(port, wsp);
       portObjs = Array.from(webSerialStore.get().values())
       webSerialStore.update(internalMap);
-      console.log(webSerialStore.get())
+//      console.log(webSerialStore.get())
       ret = wsp;
     }
     return ret
@@ -415,7 +415,7 @@ export default (() => {
       internalMap.delete(port);
       portObjs = Array.from(webSerialStore.get().values())
       webSerialStore.update(internalMap)
-      console.log(webSerialStore.get())
+//      console.log(webSerialStore.get())
     }
   }
 
@@ -460,7 +460,7 @@ export default (() => {
           retVal = addWebSerialStore(newPorts[0]);
         } else {
           // more than one new port.
-          console.log("More than one port may added, unexpected")
+          console.error("More than one port may added, unexpected")
         }
       } catch (e) {
         throw e
