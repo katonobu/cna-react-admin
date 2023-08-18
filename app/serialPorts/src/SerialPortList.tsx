@@ -1,5 +1,6 @@
+import { useEffect} from 'react'
 import { Datagrid, List, TextField, Button, TopToolbar, SimpleList} from 'react-admin';
-import { useCreate} from 'react-admin';
+import { useCreate, useRefresh} from 'react-admin';
 import AddIcon from '@mui/icons-material/Add';
 import { Box, Typography, useMediaQuery } from '@mui/material';
 import {useSerialPorts} from '../../webSerialDataProvider/src/webSerialDataProvider'
@@ -67,7 +68,12 @@ const Empty = () => {
 // レスポンシブ対応は https://marmelab.com/react-admin/ListTutorial.html#responsive-lists より引用
 // バルク選択 enable/disable制御は https://marmelab.com/react-admin/Datagrid.html#isrowselectable より引用
 export const SerialPortsList = () => {
-    const isSmall = useMediaQuery((theme:any) => theme.breakpoints.down('sm'));    
+    const isSmall = useMediaQuery((theme:any) => theme.breakpoints.down('sm')); 
+    const serialPorts = useSerialPorts()
+    const refresh = useRefresh()
+    useEffect(()=>{
+        refresh()
+    },[serialPorts, refresh])
     return (
         <List
             empty={<Empty />}        

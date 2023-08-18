@@ -23,7 +23,7 @@ const SendButton = ()=>{
     return (
         <Button
             disabled={!isOpen}
-            onClick={()=>sendData(new TextEncoder().encode("Hello world\n"))}
+            onClick={()=>sendData(new TextEncoder().encode(`Hello world ${((new Date()).getTime()).toString()}\n`))}
         >
             SEND            
         </Button>        
@@ -53,6 +53,7 @@ const OpenCloseButton = ()=> {
                         }
                         setDisabled(false)
                     })
+                    .catch(()=>setDisabled(false))
                 } else {
                     setDisabled(true)
                     open({baudRate:115200})
@@ -64,6 +65,7 @@ const OpenCloseButton = ()=> {
                         }
                         setDisabled(false)
                     })
+                    .catch(()=>setDisabled(false))
                 }
             }}
             sx={{ width: isSmall?'24px':'10em' }}
@@ -92,12 +94,13 @@ const Actions = () => (
 const Aside = () => {
 	const recordId = useGetRecordId()
     const record = useRecordContext();
+    const isOpen = useIsOpen(recordId.toString(10))
     if(record && 'venderName' in record && 'isOpen' in record){
         return (
             <ul style={{ width: 200, margin: '1em' }}>
                 <li style={{listStyle: 'none'}}>ID:{recordId}</li>
                 <li style={{listStyle: 'none'}}>Name:{record.venderName}</li>
-                <li style={{listStyle: 'none'}}>Open:{(record.isOpen==='Open').toString()}</li>
+                <li style={{listStyle: 'none'}}>Open:{isOpen.toString()}</li>
             </ul>
         );
     } else {

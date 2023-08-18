@@ -5,48 +5,33 @@
   - webSerialDataPorts.tsで状態管理実装が2系統ある。
     - MicroStoreに統一する。
 
-  - データ蓄積と表示方法の改善
-    - SerialPortEdit.tsxでは表示に必要な行数分だけ保持している。
-    - dataProviderのデータ側に起動後からのデータを蓄積
-      - infinit pagenationで常に最新のを表示させ、古いのもさかのぼれるようにするのがいいかも。
-      - 検索とかもできだし
-      - タイムスタンプつけても便利そう
-
   - スマホサイズの画面にすると右側のボタンが見えなくなる。
     - Shwoは未解決
  
 - 全体アーキテクチャ見直し
-  - layerと依存/前提
-    - webSerialDataPorts.ts : vanilla
-      - webSerialDataPorts.ts をまたぐsubscribe-callbackによる受信データ伝送は、receive関数のcallbackとする。
-      - バイナリ文字列変換、パケッタイズは上位で行い、この階層ではひたすらrx-publishを行う
+  - Worker:vanilla
+    - webSerialDataPorts.ts
+      - シリアルポートの有効ポート数管理、各ポートの送受信処理を行う。
+      - Application側I/Fは極力シンプルにしておくことで、worker/mainのどちらのスレッドでも使えるようにする
+    - vendors.ts
+      - メジャーどころだけ押さえておけばいいのかも。
+    - workerHandler.ts
+      - workerスレッドのevent I/FとwebSerialDataPorts.tsを繋ぐ。
 
-    - webSerialDataParser.ts : vanilla
-      - 連続したバイナリデータに対して、要求に応じてバイナリ文字列変換、パケッタイズを行う。
-        - subscibe/publish I/Fとする。
-          - newLine文字列パーサー
-          - SWVパーサー
-          - cmd/rsp/evtパーサー(CXM150x)
-          - cmd/rsp/evtパーサー(BCX)
+  - Main:vanilla
+    - webSerialWorkerAdapter.ts
+      - workerHandler.ts の対になる処理を行う。
+      - 送受信系向けPromise,イベント発火系publisherを実装する。
 
-    - webSerialDataProvider.ts : react + reqct-query
-      - レコード長固定バイナリデータのcmd/rsp(BCX-FW Update,TX-FW Update)
-        - cmdは送信完了Promiseとして見せる
-        - rspは長さ指定read
-      - ストリーミングバイナリデータの受信/パース(SWV)
-        - パース後データをuseSyncExternalStoreによるhookとして見せる
-      - 文字列データ/改行コードによる行分割(CXM150x/BCX)
-        - 改行分割後の受信データはuseSyncExternalStoreによるhookとして見せる
-        - cmd/rspはreqct-queryで使えるPromiseとして見せる
-        - evtはuseSyncExternalStoreによるhookとして見せる
+  - Main:react
+    - webSerialDataProvider.ts
+      - react向けuseXXXを提供
+      - 送受信系はPromiseを返すusexxx
+      - イベント発火系はuseSyncExternalStoreを返すusexxx
 
 - 検証
   - webSerialDataPorts.ts のブラッシュアップ/検証
   - webSerialDataProvider.ts の検証はwebSerialDataPorts.tsのモックでnodeでやる?
-
-
-
-
 
 - 解決した課題
   - Edit画面で、シリアルの送受信表示
@@ -111,3 +96,12 @@
 
   - スマホサイズの画面にすると右側のボタンが見えなくなる。
     - Listは、https://marmelab.com/react-admin/ListTutorial.html#responsive-lists を参考にして解決
+
+  - データ蓄積と表示方法の改善
+    - SerialPortEdit.tsxでは表示に必要な行数分だけ保持している。
+    - dataProviderのデータ側に起動後からのデータを蓄積
+      - infinit pagenationで常に最新のを表示させ、古いのもさかのぼれるようにするのがいいかも。
+      - 検索とかもできだし
+      - タイムスタンプつけても便利そう
+
+
