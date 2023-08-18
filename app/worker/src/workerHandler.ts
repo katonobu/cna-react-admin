@@ -2,22 +2,61 @@ import {fetchSerialObject} from '@/app/webSerialDataProvider/src/webSerialWorker
 import webSerialPorts from './webSerialPorts';
 import { MicroStore } from './webSerialPorts';
 
-interface responseType {
-    status:number;
-    error?:string;
-    data?:object | object[] | string | null; // WebSerialPort | WebSerialPort[] | string | rxLineBuffRspType | null
-    rspId?:number
+export interface webSerialPortType {
+    idStr: string;
+    venderName: string;
+    pid: number;
+    vid: number;
+    isOpen: boolean;
+    signals: object;
+    errorStr: string;
 }
-
 interface rxLineBuffType {
     ts:number,
     data:string
 }
 
-interface rxLineBuffRspType {
+export interface rxLineBuffRspType {
     data:rxLineBuffType[];
     total:number;
     pageInfo?:{hasPreviousPage:boolean, hasNextPage:boolean}
+}
+
+export interface rxLineNumType {
+    totalLines:number;
+    updatedLines:number
+}
+
+export interface responseType {
+    status:number;
+    error?:string;
+    data?:webSerialPortType | webSerialPortType[] | string | rxLineBuffRspType | null;
+    rspId:number
+}
+
+export interface notificationArgType {
+    msg:string;
+    ports?:webSerialPortType[];
+    maxId?:number;
+    stt?:boolean;
+    portId?:number;
+    rxLineNum?:rxLineNumType;
+    result?:string;
+}
+export interface notificationType extends notificationArgType{
+    notId:number;
+}
+
+const toWebSerialType = (port:any):webSerialPortType => {
+    return {
+        idStr:port?.idStr,
+        venderName:port?.venderName,
+        pid:port?.pid,
+        vid:port?.vid,
+        isOpen:port?.isOpen,
+        signals:port?.signals,
+        errorStr:port?.errorStr
+    }
 }
 
 const rxLineBuffers:MicroStore<rxLineBuffType[]>[] = []
@@ -38,14 +77,18 @@ export const getRxLineBuffers = (id:number, page:number,perPage:number):rxLineBu
 }
 
 let notifyId = 0
-const sendNotify = (sendObj:object) => {
+const sendNotify = (sendObj:notificationArgType) => {
     self.postMessage(JSON.stringify({...sendObj, notId:notifyId}));
     notifyId += 1
 }
 
-const rxLineBufferLines:any[] = []
+const rxLineNum:rxLineNumType[] = []
 const onPortsChange = ()=>{
-    sendNotify({msg:"PortsChanged", ports:webSerialPorts.getPorts(), maxId:webSerialPorts.getMaxId()})
+    sendNotify({
+        msg:"PortsChanged",
+        ports:webSerialPorts.getPorts().map((port)=>toWebSerialType(port)),
+        maxId:webSerialPorts.getMaxId()
+    })
 
     console.log("AddPortsId :: ", rxLineBuffers.length, " to ", webSerialPorts.getMaxId())
     for (let portId = rxLineBuffers.length; portId < webSerialPorts.getMaxId(); portId++) {
@@ -55,9 +98,9 @@ const onPortsChange = ()=>{
         })
         rxLineBuffers[portId] = new MicroStore([])
         rxLineBuffers[portId].subscribe(()=>{
-            sendNotify({msg:"DataRx", rxLines:rxLineBufferLines[portId], portId})
+            sendNotify({msg:"DataRx", rxLineNum:rxLineNum[portId], portId})
         })
-        rxLineBufferLines[portId] = {totalLines:0, updatedLines:0}
+        rxLineNum[portId] = {totalLines:0, updatedLines:0}
         port.subscribeRx(()=>{
             const ts:number = (new Date()).getTime()
             const rxLines = port.rx
@@ -65,7 +108,7 @@ const onPortsChange = ()=>{
             const addLines = rxLines.map((data, idx)=>({data, ts, id:idx+idBase}))
 //            console.log(portId, ts, rxLines.length, addLines)
             const newRxLines = rxLineBuffers[portId].get().concat(addLines)
-            rxLineBufferLines[portId] = {totalLines:newRxLines.length, updatedLines:rxLines.length}
+            rxLineNum[portId] = {totalLines:newRxLines.length, updatedLines:rxLines.length}
 //            console.log(ts, rxLines.length, newRxLines)
             rxLineBuffers[portId].update(newRxLines)
         })
@@ -106,12 +149,12 @@ const handlerImplements = (path:string, method:string, headers:any, body:any) =>
         if (path === "/ports") {
             if (upperMethod === "GET"){
                 rsp.status = 200
-                rsp.data = webSerialPorts.getPorts()
+                rsp.data = webSerialPorts.getPorts().map((port)=>toWebSerialType(port))
             } else if (upperMethod === "PATCH"){
                 return webSerialPorts.onCreate()
                 .then((res)=>{
                     rsp.status = 200
-                    rsp.data = res
+                    rsp.data = toWebSerialType(res)
                     console.log(path, method, body, rsp)
                     return rsp
                 })
@@ -239,7 +282,7 @@ const handlerImplements = (path:string, method:string, headers:any, body:any) =>
             if (parseInt(idStr, 10) < webSerialPorts.getMaxId()){
                 if (upperMethod === "GET"){
                     rsp.status = 200
-                    rsp.data = webSerialPorts.getPortById(idStr)
+                    rsp.data = toWebSerialType(webSerialPorts.getPortById(idStr))
                 } else if (upperMethod === "DELETE"){
                     rsp.status = 200
                     webSerialPorts.getPortById(idStr).forget()

@@ -1,10 +1,11 @@
 import { DataProvider } from 'ra-core';
 import { CreateResult, DeleteResult, DeleteManyResult, GetListResult, GetOneResult } from 'react-admin';
 import { getPorts, createPort, getPort, deletePort, getPage } from '@/app/webSerialDataProvider/src/webSerialDataProvider';
+import { webSerialPortType } from '@/app/worker/src/workerHandler'
 
 const webSerialProvider = (): DataProvider => {
     console.log("webSerialProvider init.")
-    const serializeWebSerialPort = (wsp:any):Object => {
+    const serializeWebSerialPort = (wsp:webSerialPortType):Object => {
 //        console.log(wsp);
         return {
             id:wsp.idStr,
