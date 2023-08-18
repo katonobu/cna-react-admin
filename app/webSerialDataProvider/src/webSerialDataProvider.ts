@@ -38,16 +38,16 @@ export const useRxBufferLen = (id:string) => useSyncExternalStore(subscribeLineN
     - POST:useClose
 - /ports/id/data
     - POST:useSend
-    - POST:useReceive
 - /ports/id/rxdata
     - GET:getRxLineBUffers()
+    - POST:useReceive
 */
 
 //interface responseType
 
 export const useGetPorts = () => {
     return (): Promise<any> => {
-        return fetchSerial("/ports/", {method:'GET'})
+        return fetchSerial("/ports", {method:'GET'})
         .then((rsp)=>{
             if ('error' in rsp) {
                 return Promise.reject(rsp.error as string)
@@ -61,7 +61,7 @@ export const useGetPorts = () => {
 
 export const useCreate = () => {
     return (): Promise<any> => {
-        return fetchSerial("/ports/", {method:'PATCH'})
+        return fetchSerial("/ports", {method:'PATCH'})
         .then((rsp)=>{
             if ('error' in rsp) {
                 return Promise.reject(rsp.error as string)
@@ -73,8 +73,8 @@ export const useCreate = () => {
     }
 }
 
-export const useGetPort = (id:string) => {
-    return (): Promise<any> => {
+export const useGetPort = () => {
+    return (id:string): Promise<any> => {
         return fetchSerial("/ports/"+id, {method:'GET'})
         .then((rsp)=>{
             if ('error' in rsp) {
@@ -92,7 +92,7 @@ export const useOpen = (id:string) => {
         return fetchSerial("/ports/"+id+"/open", {method:'POST', body:{options}})
         .then((rsp)=>{
             if ('error' in rsp) {
-                return rsp.error as string
+                return Promise.reject(rsp.error as string)
             } else {
                 return ""
             }
@@ -106,7 +106,7 @@ export const useSend = (id:string) => {
         return fetchSerial("/ports/"+id+"/data", {method:'POST', body:{data:btoa(String.fromCharCode(...data))}})
         .then((rsp)=>{
             if ('error' in rsp) {
-                return rsp.error as string
+                return Promise.reject(rsp.error as string)
             } else {
                 return ""
             }
@@ -120,9 +120,24 @@ export const useReceieve = (id:string) => {
         return fetchSerial("/ports/"+id+"/rxdata", {method:'POST', body:{byteLength, timeoutMs, newLineCode}})
         .then((rsp)=>{
             if ('error' in rsp) {
-                return rsp.error as string
+                return Promise.reject(rsp.error as string)
             } else {
                 return ""
+            }
+        })
+        .catch((e)=>(Promise.reject(e)))
+    }
+}
+
+export const useGetPage = () => {
+    return (id:string, page:number, perPage:number) => {
+        const body = {id, page, perPage}
+        return fetchSerial("/ports/"+id + "/rxdata", {method:'GET', body})
+        .then((rsp)=>{
+            if ('error' in rsp) {
+                return Promise.reject(rsp.error as string)
+            } else {
+                return rsp.data
             }
         })
         .catch((e)=>(Promise.reject(e)))
@@ -134,7 +149,7 @@ export const useClose = (id:string) => {
         return fetchSerial("/ports/"+id+"/close", {method:'POST'})
         .then((rsp)=>{
             if ('error' in rsp) {
-                return rsp.error as string
+                return Promise.reject(rsp.error as string)
             } else {
                 return ""
             }
@@ -143,12 +158,13 @@ export const useClose = (id:string) => {
     }
 }
 
-export const useDelete = (id:string) => {
-    return (): Promise<string> => {
+export const useDelete = () => {
+    return (id:string): Promise<string> => {
+        console.log("useDelete","/ports/"+id)
         return fetchSerial("/ports/"+id, {method:'DELETE'})
         .then((rsp)=>{
             if ('error' in rsp) {
-                return rsp.error as string
+                return Promise.reject(rsp.error as string)
             } else {
                 return ""
             }

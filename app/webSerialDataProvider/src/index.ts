@@ -1,6 +1,6 @@
 import { DataProvider } from 'ra-core';
-import { CreateResult, DeleteResult, DeleteManyResult, GetListResult, GetManyReferenceResult, GetManyResult, GetOneResult, UpdateManyResult, UpdateResult } from 'react-admin';
-import {fetchSerial} from '@/app/webSerialDataProvider/src/webSerialWorkerAdapter'
+import { CreateResult, DeleteResult, DeleteManyResult, GetListResult, GetOneResult } from 'react-admin';
+import { useGetPorts, useGetPort, useCreate, useDelete, useGetPage } from '@/app/webSerialDataProvider/src/webSerialDataProvider';
 
 const webSerialProvider = (): DataProvider => {
     console.log("webSerialProvider init.")
@@ -14,48 +14,37 @@ const webSerialProvider = (): DataProvider => {
             isOpen:wsp.isOpen?'Open':'Close',
         }
     };
+    const getPorts = useGetPorts()
+    const getPort = useGetPort()
+    const createPort = useCreate()
+    const deletePort = useDelete()
+    const getPage = useGetPage()
     return {
         getList: (resource, params) => {
             if (resource === 'List_Add_Port') {
-                return fetchSerial("/ports", {method:'GET'})
-                .then((rsp)=>{
-                    if ('data' in rsp && Array.isArray(rsp.data)) {
-                        return {
-                            data:rsp.data.map((wsp)=>serializeWebSerialPort(wsp)),
-                            total:rsp.data.length
-                        } as GetListResult                    
-                    } else {
-                        return {data:[{id:0}], total:1} as GetListResult
-                    }
+                return getPorts()
+                .then((data)=>{
+                    return {
+                        data:data.map((wsp)=>serializeWebSerialPort(wsp)),
+                        total:data.length
+                    } as GetListResult                    
                 })
                 .catch((e)=>(Promise.reject(e)))
             } else if (resource === 'Port_Rx_Data') {
-                const body = {id:params.meta.id, page:params.pagination.page, perPage:params.pagination.perPage}
-                return fetchSerial("/ports/"+params.meta.id.toString(10) + "/rxdata", {method:'GET', body})
-                .then((rsp)=>{
-                    if ('data' in rsp) {
-                        return rsp.data as unknown as GetListResult
-                    } else {
-                        return {data:[{id:0}], total:1} as GetListResult
-                    }
+                return getPage(params.meta.id.toString(10), params.pagination.page, params.pagination.perPage)
+                .then((data)=>{
+                    return data as unknown as GetListResult
                 })
+                .catch((e)=>(Promise.reject(e)))
             } else {
                 return Promise.resolve({data:[{id:0}], total:1} as GetListResult)
             }
         },
 
         getOne: (resource, params) =>{
-            return fetchSerial(`/ports/${params.id}`, {method:'GET'})
-            .then((rsp)=>{
-                if ('data' in rsp){
-                    if (rsp.data) {
-                        return {data:serializeWebSerialPort(rsp.data)} as GetOneResult
-                    } else {
-                        return Promise.reject(new Error(`${params.id} is not found`))
-                    }
-                } else {
-                    return {data:null} as GetOneResult
-                }
+            return getPort(params.id.toString(10))
+            .then((data)=>{
+                return {data:serializeWebSerialPort(data)} as GetOneResult
             })
             .catch((e)=>(Promise.reject(e)))
         },
@@ -74,19 +63,10 @@ const webSerialProvider = (): DataProvider => {
         },
         create: (resource, params) => {
             return navigator.serial.requestPort({})
-            .then((port)=>{
-                return fetchSerial("/ports", {method:'PATCH'})
-                .then((rsp)=>{
-                    if ('data' in rsp){
-                        if (rsp.data) {
-                            return {data:serializeWebSerialPort(rsp.data)} as CreateResult
-                        } else {
-                            // may selected already registrated port.
-                            throw new Error('Select already registrated')
-                        }
-                    } else {
-                        return {data:null} as CreateResult
-                    }
+            .then((_)=>{
+                return createPort()
+                .then((data)=>{
+                    return {data:serializeWebSerialPort(data)} as CreateResult
                 })
                 .catch((e)=>(Promise.reject(e)))
             })
@@ -97,27 +77,19 @@ const webSerialProvider = (): DataProvider => {
         },
 
         delete: (resource, params) => {
-            return fetchSerial(`/ports/${params.id}`, {method:'GET'})
-            .then((rsp)=>{
-                if ('data' in rsp){
-                    if (rsp.data) {
-                        const tmp = serializeWebSerialPort(rsp.data)
-                        return fetchSerial(`/ports/${params.id}`, {method:'DELETE'})
-                        .then((_)=>{return {data:tmp} as DeleteResult})
-                        .catch((e)=>(Promise.reject(e)))
-                    } else {
-                        return Promise.reject(new Error(`${params.id} is not found`))
-                    }
-                } else {
-                    return {data:null} as DeleteResult
-                }
+            return getPort(params.id.toString(10))
+            .then((data)=>{
+                const tmp = serializeWebSerialPort(data)
+                return deletePort(params.id.toString(10))
+                .then((_)=>{return {data:tmp} as DeleteResult})
+                .catch((e)=>(Promise.reject(e)))
             })
             .catch((e)=>(Promise.reject(e)))
         },
 
         deleteMany: (resource, params) => {
             return Promise.all(
-                params.ids.map(id => fetchSerial(`/ports/${id}`, {method:'DELETE'}))
+                params.ids.map(id => deletePort(id.toString(10)))
             ).then(()=>({data:params.ids} as DeleteManyResult))
             .catch((e)=>(Promise.reject(e)))
         }
