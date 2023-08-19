@@ -58,18 +58,21 @@ const webSerialProvider = (): DataProvider => {
             return Promise.reject(new Error('updateMany() is not implemented yet'));
         },
         create: (resource, params) => {
-            return navigator.serial.requestPort({})
-            .then((_)=>{
-                return createPort()
-                .then((data)=>{
-                    return {data:serializeWebSerialPort(data)} as CreateResult
-                })
-                .catch((e)=>(Promise.reject(e)))
-            })
-            .catch((e)=>{
-                return Promise.reject(e)
-            })
-
+            if (typeof window !== 'undefined' && "serial" in navigator) {
+                return navigator.serial.requestPort({})
+                    .then((_) => {
+                        return createPort()
+                            .then((data) => {
+                                return { data: serializeWebSerialPort(data) } as CreateResult
+                            })
+                            .catch((e) => (Promise.reject(e)))
+                    })
+                    .catch((e) => {
+                        return Promise.reject(e)
+                    })
+            } else {
+                return Promise.reject("Not browser")
+            }
         },
 
         delete: (resource, params) => {

@@ -1,5 +1,5 @@
 import { webSerialPortType, responseType, rxLineNumType, notificationType } from '@/app/worker/src/workerHandler'
-import {worker} from '../../AppRoot'
+import {webSerialWorker} from '@/app/worker/src/webSerialWorkerProvider'
 
 interface fetchSerialOption {
     method:string;
@@ -113,7 +113,7 @@ let fetechSerialId:number = 0
 export const fetchSerial = (resource:string, option:fetchSerialOption):Promise<responseType>=>{
     return new Promise((resolve, reject)=>{
         resolverMap.set(fetechSerialId, {resolve, reject})
-        worker.postMessage(JSON.stringify({...option, path:resource, reqId:fetechSerialId}));
+        webSerialWorker?.postMessage(JSON.stringify({...option, path:resource, reqId:fetechSerialId}));
         fetechSerialId += 1
     })
 }
