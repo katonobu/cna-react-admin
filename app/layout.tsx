@@ -1,6 +1,5 @@
 import './globals.css'
 import { Inter } from 'next/font/google'
-import {WebSerialWorkerProvider} from '@/app/worker/src/webSerialWorkerProvider'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -17,9 +16,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <WebSerialWorkerProvider>
-          {children}
-        </WebSerialWorkerProvider>
+        {children}
       </body>
     </html>
   )

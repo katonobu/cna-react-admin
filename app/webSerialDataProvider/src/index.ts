@@ -1,7 +1,7 @@
 import { DataProvider } from 'ra-core';
 import { CreateResult, DeleteResult, DeleteManyResult, GetListResult, GetOneResult } from 'react-admin';
-import { getPorts, createPort, getPort, deletePort, getPage } from '@/app/webSerialDataProvider/src/webSerialDataProvider';
-import { webSerialPortType } from '@/app/worker/src/workerHandler'
+import { getPorts, createPort, getPort, deletePort, getPage } from '@/app/webSerialDataProvider/src/webSerialWorkerAdapter';
+import { webSerialPortType } from '@/app/webSerialDataProvider/src/webSerialWorkerAdapter';
 
 const webSerialProvider = (): DataProvider => {
     console.log("webSerialProvider init.")
@@ -58,21 +58,13 @@ const webSerialProvider = (): DataProvider => {
             return Promise.reject(new Error('updateMany() is not implemented yet'));
         },
         create: (resource, params) => {
-            if (typeof window !== 'undefined' && "serial" in navigator) {
-                return navigator.serial.requestPort({})
-                    .then((_) => {
-                        return createPort()
-                            .then((data) => {
-                                return { data: serializeWebSerialPort(data) } as CreateResult
-                            })
-                            .catch((e) => (Promise.reject(e)))
-                    })
-                    .catch((e) => {
-                        return Promise.reject(e)
-                    })
-            } else {
-                return Promise.reject("Not browser")
-            }
+            return createPort({})
+            .then((data) => {
+                return { data: serializeWebSerialPort(data) } as CreateResult
+            })
+            .catch((e) => {
+                return Promise.reject(e)
+            })
         },
 
         delete: (resource, params) => {

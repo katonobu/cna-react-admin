@@ -1,16 +1,7 @@
-import {fetchSerialObject} from '@/app/webSerialDataProvider/src/webSerialWorkerAdapter'
+import {webSerialPortType, fetchSerialObject} from '@/app/webSerialDataProvider/src/webSerialWorkerAdapter'
 import webSerialPorts from './webSerialPorts';
 import { MicroStore } from './webSerialPorts';
 
-export interface webSerialPortType {
-    idStr: string;
-    venderName: string;
-    pid: number;
-    vid: number;
-    isOpen: boolean;
-    signals: object;
-    errorStr: string;
-}
 interface rxLineBuffType {
     ts:number,
     data:string
