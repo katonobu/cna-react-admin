@@ -1,3 +1,4 @@
+"use client";
 import {useSyncExternalStore, useMemo} from 'react'
 import {portsStore, openSttStore, rxLineNumStore} from '@/app/webSerialDataProvider/src/webSerialWorkerAdapter'
 import { getPorts, createPort, updatePort, getPort, deletePort, getPage } from '@/app/webSerialDataProvider/src/webSerialWorkerAdapter';
