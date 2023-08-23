@@ -1,3 +1,9 @@
+# 概要
+- 2023/08/23
+- CreateNextApp + readt-adminをベースにしたweb-serialアプリケーション。
+- ssg動作するので、gh-page公開してる。
+- ライブラリ整備に注力するため、当面いじる予定なし。
+
 # 状況
 - 現状の課題
   - webSerialDataPorts.tsで文字列変換、改行コード分割処理を入れている。
