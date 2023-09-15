@@ -1,16 +1,16 @@
 import { useEffect} from 'react'
-import { Datagrid, List, TextField, Button, TopToolbar, SimpleList} from 'react-admin';
+import { Datagrid, List, TextField, Button, TopToolbar, SimpleList, BulkDeleteButton} from 'react-admin';
 import { useCreate, useRefresh} from 'react-admin';
 import AddIcon from '@mui/icons-material/Add';
 import { Box, Typography, useMediaQuery } from '@mui/material';
-import {useSerialPorts} from '../../webSerialDataProvider/src/webSerialDataProvider'
+import { useSerialPorts } from '@/app/webSerialDataProvider/src/useJsSerialWeb'
 
 const AttachButton = (props:{
         disable_not_empty?:boolean, 
         variant?:"text" | "outlined" | "contained" | undefined
     }) => {
     const {disable_not_empty = false, variant='text'} = props
-    const serialPorts = useSerialPorts()
+    const serialPorts = []//useSerialPorts()
     const [create, { isLoading }] = useCreate('webserialport', {});
     return (
         <Button
@@ -64,6 +64,10 @@ const Empty = () => {
     }
 }
 
+// うまく効いていない
+const postRowSx = (record, index) => ({
+    backgroundColor: record.available === "TRUE" ? 'red' : 'blue',
+});
 
 // レスポンシブ対応は https://marmelab.com/react-admin/ListTutorial.html#responsive-lists より引用
 // バルク選択 enable/disable制御は https://marmelab.com/react-admin/Datagrid.html#isrowselectable より引用
@@ -82,19 +86,23 @@ export const SerialPortsList = () => {
             {isSmall?(
                 <SimpleList
                     primaryText={record => record.id}
-                    secondaryText={record => record.venderName}
-                    tertiaryText={record => record.isOpen}
+                    secondaryText={record => record.available}
                 />
             ):(
                 <Datagrid
-                    rowClick='edit'
-                    isRowSelectable={ record => (record.isOpen === 'Close') }
+//                    rowClick='edit'
+                    bulkActionButtons={
+                        <BulkDeleteButton
+                            mutationMode='pessimistic'
+                        />
+                    }
+                    rowSx={postRowSx}
+                    isRowSelectable={ record => record.available === 'TRUE' }
                 >
                     <TextField source="id" />
+                    <TextField source="available"/>
                     <TextField source="vid" />
-                    <TextField source="venderName" />
                     <TextField source="pid" />
-                    <TextField source="isOpen" />
                 </Datagrid>
             )}
         </List>

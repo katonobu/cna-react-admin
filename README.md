@@ -6,6 +6,8 @@
 
 # 状況
 - 現状の課題
+  - DataGridの文字の色を変えられない。
+    - (Datagrid.rowSx)[https://marmelab.com/react-admin/Datagrid.html#rowsx]で変えられそうだが、、うまく効かない。
   - webSerialDataPorts.tsで文字列変換、改行コード分割処理を入れている。
     - callbackでbinaryデータ、文字列データのいずれでも扱えるようにする。
   - webSerialDataPorts.tsで状態管理実装が2系統ある。
@@ -110,4 +112,13 @@
       - 検索とかもできだし
       - タイムスタンプつけても便利そう
 
-
+  - Delete時にoptimisticに表示される
+    - DatagridのPropertyに
+      ```
+      bulkActionButtons={
+          <BulkDeleteButton
+              mutationMode='pessimistic'
+          />
+      }
+      ```
+      を追加した。

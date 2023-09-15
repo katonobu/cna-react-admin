@@ -16,6 +16,7 @@
     "@types/web": "^0.0.102",
     "eslint": "8.43.0",
     "eslint-config-next": "13.4.7",
+    "js-serial-web": "file:../js-serial/packages/js-serial-web",
     "next": "13.4.7",
     "ra-data-json-server": "^4.11.4",
     "react": "18.2.0",
