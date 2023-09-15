@@ -5,6 +5,13 @@ import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
 import SerialPortIcon from '@/app/serialPorts/src/SerialPortIcon'
 import UsbIcon from '@mui/icons-material/Usb';
 
+type portDataType = {
+  id:number,
+  pid:number,
+  vid:number,
+  available:boolean
+}
+
 const baseResource = <Menu.Item
   value={"/List_Add_Port"}
   to={"/List_Add_Port"}
@@ -12,13 +19,13 @@ const baseResource = <Menu.Item
   primaryText="List/Add Port"
   leftIcon={<PlaylistAddIcon/>} 
 />
-const makeIcon = (port)=>{
+const makeIcon = (port:portDataType)=>{
   const colorStr = port.available?"rgba(0, 0, 0, 0.54)":"rgba(0, 0, 0, 0.20)"
   return (port.pid===0 && port.vid===0)?<SerialPortIcon color={colorStr}/>:<UsbIcon htmlColor={colorStr}/>  
 }
 const MyMenu = () => {
   const [portsInfo, setPortsInfo] = useState([baseResource])
-  const serialPorts:{id:number,pid:number,vid:number,available:boolean}[] = useSerialPorts()
+  const serialPorts:portDataType[] = useSerialPorts()
   // SerialPortIcon　固定値で色指定しているのがイケてない。。。
   useEffect(() => {
     const devices = serialPorts.map((port)=>{

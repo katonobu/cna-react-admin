@@ -65,9 +65,11 @@ const Empty = () => {
 }
 
 // うまく効いていない
+/*
 const postRowSx = (record, index) => ({
     backgroundColor: record.available === "TRUE" ? 'red' : 'blue',
 });
+*/
 
 // レスポンシブ対応は https://marmelab.com/react-admin/ListTutorial.html#responsive-lists より引用
 // バルク選択 enable/disable制御は https://marmelab.com/react-admin/Datagrid.html#isrowselectable より引用
@@ -96,8 +98,8 @@ export const SerialPortsList = () => {
                             mutationMode='pessimistic'
                         />
                     }
-                    rowSx={postRowSx}
-                    isRowSelectable={ record => record.available === 'TRUE' }
+//                    rowSx={postRowSx}
+                    isRowSelectable={ (record:{available:string}) => record.available === 'TRUE' }
                 >
                     <TextField source="id" />
                     <TextField source="available"/>

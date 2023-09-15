@@ -1,10 +1,10 @@
 import SerialPortIcon from './SerialPortIcon'
 import {SerialPortsList} from './SerialPortList';
-import {SerialPortEdit} from './SerialPortEdit'
+//import {SerialPortEdit} from './SerialPortEdit'
 
 const resource = {
     list: SerialPortsList,
-    edit: SerialPortEdit,
+//    edit: SerialPortEdit,
     icon: SerialPortIcon,
 };
 
