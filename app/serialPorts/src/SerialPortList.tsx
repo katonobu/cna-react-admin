@@ -1,9 +1,12 @@
-import { useEffect} from 'react'
+import { useEffect, useContext} from 'react'
 import { Datagrid, List, TextField, Button, TopToolbar, SimpleList, BulkDeleteButton} from 'react-admin';
-import { useCreate, useRefresh} from 'react-admin';
+import { useCreate, useRefresh, useRecordContext } from 'react-admin';
 import AddIcon from '@mui/icons-material/Add';
 import { Box, Typography, useMediaQuery } from '@mui/material';
 import { useSerialPorts } from '@/app/webSerialDataProvider/src/useJsSerialWeb'
+import {JsSerialWebContext} from '@/app/AppRoot'
+import { portRecordType } from '@/app/webSerialDataProvider/src/index'
+
 
 const AttachButton = (props:{
         disable_not_empty?:boolean, 
@@ -64,6 +67,36 @@ const Empty = () => {
     }
 }
 
+const GetStatusStr = (record:portRecordType)=>{
+    const jsw = useContext(JsSerialWebContext)
+    if (!record) return "";
+    const recordId = record.id
+
+    if (!jsw) return ""
+    const isOpen = jsw.getOpenStt(recordId)
+    if (!record) return "";    
+    const available = record.available === 'TRUE'
+    let stt = ""
+    if (available) {
+        if (isOpen) {
+            stt = "OPEN"
+        } else {
+            stt = "CLOSE"
+        }
+
+    } else {
+        stt = record.reason
+    }
+    return stt
+}
+
+const StatusField = ({label=""}:{label?:string})=>{
+    const record = useRecordContext() as portRecordType
+    if (!record) return null;
+    const stt = GetStatusStr(record)
+    return <span>{stt}</span>;
+}
+
 // うまく効いていない
 /*
 const postRowSx = (record, index) => ({
@@ -88,7 +121,7 @@ export const SerialPortsList = () => {
             {isSmall?(
                 <SimpleList
                     primaryText={record => record.id}
-                    secondaryText={record => record.available}
+                    secondaryText={record => GetStatusStr(record)}
                 />
             ):(
                 <Datagrid
@@ -102,7 +135,7 @@ export const SerialPortsList = () => {
                     isRowSelectable={ (record:{available:string}) => record.available === 'TRUE' }
                 >
                     <TextField source="id" />
-                    <TextField source="available"/>
+                    <StatusField label="Status"/>
                     <TextField source="vid" />
                     <TextField source="pid" />
                 </Datagrid>
