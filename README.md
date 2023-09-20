@@ -4,6 +4,33 @@
 - ssg動作するので、gh-page公開してる。
 - ライブラリ整備に注力するため、当面いじる予定なし。
 
+# GitHubPackageでリリースされたNPMパッケージを使う。
+## 肝
+- .npmrcで、@katonobu nameSpaceは`https://npm.pkg.github.com`に見に行くように指示する。
+- .npmrcで、パッケージリポジトリアクセスに必要なtokenを記載しておく。
+### ローカル実行用の設定
+- .npmrcを作成
+```
+@katonobu:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=ghp_.......
+```
+  - .npmrcは.gitignoreでコミット対象外としておく!
+
+### GitHubActionでの設定
+- パッケージ読み出し用のトークンを作る。
+  - パッケージ登録用は、`write:packages`にチェックを入れたが、`read:packages`だけにチェックを入れたトークンを作る
+- [リポジトリのシークレットの作成](https://docs.github.com/ja/actions/security-guides/using-secrets-in-github-actions#creating-secrets-for-a-repository)を参考に、読み出し用のトークンをシークレットに入れる。
+  - シークレットの名前を`JS_SERIAL_NPM_ACCESS_TOKEN`としておく。
+- workflowで.npmrcを生成する。
+  - `.github\workflows\nextjs.yml` の`- name: Install dependencies`の前に、下記記載を追加
+```
+      - name: Authenticate with GitHub Packages(1/2)
+        run: echo "@katonobu:registry=https://npm.pkg.github.com" > ~/.npmrc
+      - name: Authenticate with GitHub Packages(2/2)
+        run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.JS_SERIAL_NPM_ACCESS_TOKEN }}" >> ~/.npmrc
+```
+  - ここで、`${{ secrets.JS_SERIAL_NPM_ACCESS_TOKEN }}`という記載で、シークレットの値が.npmrcに入れ込まれる。
+  
 # 状況
 - 現状の課題
   - DataGridの文字の色を変えられない。
