@@ -5,7 +5,7 @@ import { useMediaQuery, Button } from '@mui/material';
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import CloseFullscreenIcon from '@mui/icons-material/CloseFullscreen';
 
-import JsSerialWeb from 'js-serial-web';
+import JsSerialWeb from '@katonobu/js-serial-web';
 import { portRecordType } from '@/app/webSerialDataProvider/src/index'
 import { useOpen, useClose, useReceieveStart, useIsOpen } from '@/app/webSerialDataProvider/src/useJsSerialWeb'
 

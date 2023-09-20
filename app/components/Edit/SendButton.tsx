@@ -1,6 +1,6 @@
 import { Button } from '@mui/material';
 
-import JsSerialWeb from 'js-serial-web';
+import JsSerialWeb from '@katonobu/js-serial-web';
 import { useSend, useIsOpen } from '@/app/webSerialDataProvider/src/useJsSerialWeb'
 
 const SendButton = ({id, jsw}:{id:number, jsw:JsSerialWeb})=>{

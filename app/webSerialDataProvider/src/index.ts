@@ -1,6 +1,6 @@
 import { DataProvider } from 'ra-core';
 import { CreateResult, DeleteResult, DeleteManyResult, GetListResult, GetOneResult } from 'react-admin';
-import JsSerialWeb from 'js-serial-web';
+import JsSerialWeb from '@katonobu/js-serial-web';
 
 export type portRecordType = {
     id:number;

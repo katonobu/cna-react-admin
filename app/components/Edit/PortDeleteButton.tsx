@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { DeleteButton, useRecordContext } from 'react-admin'
 
-import JsSerialWeb from 'js-serial-web';
+import JsSerialWeb from '@katonobu/js-serial-web';
 import { portRecordType } from '@/app/webSerialDataProvider/src/index'
 import { useIsOpen } from '@/app/webSerialDataProvider/src/useJsSerialWeb'
 

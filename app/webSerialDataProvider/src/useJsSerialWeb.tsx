@@ -1,6 +1,6 @@
 import { useSyncExternalStore} from 'react'
 import { useMemo } from 'react';
-import JsSerialWeb from 'js-serial-web';
+import JsSerialWeb from '@katonobu/js-serial-web';
 
 // useSerialPorts
 const getSerialPorts = (jsw:JsSerialWeb) => () => jsw.getPorts().curr
@@ -37,16 +37,16 @@ export const useRxBufferLen = (jsw:JsSerialWeb, id:number) => {
 
 export const useOpen       = (jsw:JsSerialWeb, id:number)=>useMemo(()=> {
     return (options:SerialOptions)=>jsw.openPort(id, options)
-},[id])
+},[id, jsw])
 
 export const useClose       = (jsw:JsSerialWeb, id:number)=>useMemo(()=> {
     return ()=>jsw.closePort(id)
-},[id])
+},[id, jsw])
 
 export const useSend       = (jsw:JsSerialWeb, id:number)=>useMemo(()=> {
     return (data:Uint8Array)=>jsw.sendPort(id, data)
-},[id])
+},[id, jsw])
 
 export const useReceieveStart= (jsw:JsSerialWeb, id:number)=>useMemo(()=> {
     return ()=>jsw.startReceivePort(id)
-},[id])
+},[id, jsw])

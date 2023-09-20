@@ -3,7 +3,7 @@ import { createContext } from 'react';
 import {Resource, Admin, Layout} from "react-admin";
 import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
 import MyMenu from '@/app/components/MyMenu'
-import JsSerialWeb from 'js-serial-web';
+import JsSerialWeb from '@katonobu/js-serial-web';
 import {SerialPortsList} from '@/app/serialPorts/src/SerialPortList'
 import {SerialPortEdit} from '@/app/serialPorts/src/SerialPortEdit'
 import webSerialProvider from "@/app/webSerialDataProvider/src";

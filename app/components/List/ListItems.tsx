@@ -1,6 +1,6 @@
 import { Datagrid, TextField, SimpleList, BulkDeleteButton, FunctionField} from 'react-admin';
 import { useMediaQuery } from '@mui/material';
-import JsSerialWeb from 'js-serial-web';
+import JsSerialWeb from '@katonobu/js-serial-web';
 import { portRecordType } from '@/app/webSerialDataProvider/src/index'
 
 
