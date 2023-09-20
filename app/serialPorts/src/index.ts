@@ -1,4 +1,4 @@
-import SerialPortIcon from './SerialPortIcon'
+import SerialPortIcon from '../../components/SerialPortIcon'
 import {SerialPortsList} from './SerialPortList';
 //import {SerialPortEdit} from './SerialPortEdit'
 

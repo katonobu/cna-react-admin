@@ -1,9 +1,10 @@
-import {Menu} from "react-admin";
-import { useState, useEffect } from 'react'
-import { useSerialPorts } from '@/app/webSerialDataProvider/src/useJsSerialWeb'
+import { useState, useEffect, useContext } from 'react'
+import { Menu } from "react-admin";
 import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
-import SerialPortIcon from '@/app/serialPorts/src/SerialPortIcon'
 import UsbIcon from '@mui/icons-material/Usb';
+import {JsSerialWebContext} from '@/app/AppRoot'
+import SerialPortIcon from '@/app/components/SerialPortIcon'
+import { useSerialPorts } from '@/app/webSerialDataProvider/src/useJsSerialWeb'
 
 type portDataType = {
   id:number,
@@ -25,7 +26,8 @@ const makeIcon = (port:portDataType)=>{
 }
 const MyMenu = () => {
   const [portsInfo, setPortsInfo] = useState([baseResource])
-  const serialPorts:portDataType[] = useSerialPorts()
+  const jsw = useContext(JsSerialWebContext)
+  const serialPorts:portDataType[] = useSerialPorts(jsw)
   // SerialPortIcon　固定値で色指定しているのがイケてない。。。
   useEffect(() => {
     const devices = serialPorts.map((port)=>{

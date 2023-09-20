@@ -20,24 +20,6 @@ const buildPortRecord = (port:any) => ({
 
 const webSerialProvider = (jsw:JsSerialWeb): DataProvider => {
     console.log("webSerialProvider init.")
-    /*
-    jsw.subscribePorts(()=>{
-        const portChangeStt = jsw.getPorts();
-        portChangeStt.attached.forEach((id:number)=>{
-          const portOption = addNewPort(id);
-          if (autoconnectCheckbox.checked) {
-            portOption.selected = true;
-            connectToPort();
-          }
-        });
-        portChangeStt.detached.forEach((id:number)=>{
-          const portOption = findPortOption(id);
-          if (portOption) {
-            portOption.remove();
-          }
-        });
-      });
-      */
     jsw.init()
     return {
         getList: (resource, params) => {
@@ -45,6 +27,18 @@ const webSerialProvider = (jsw:JsSerialWeb): DataProvider => {
                 const ps = jsw.getPorts()
                 const data = ps.curr.map((port)=>buildPortRecord(port))
                 return Promise.resolve({data, total:ps.curr.length} as GetListResult)
+            } else if (resource === 'Port_Rx_Data') {
+                const id = parseInt(params.meta.id.toString(10), 10)
+                const page = params.pagination.page
+                const perPage = params.pagination.perPage
+                const startIndex = page * perPage
+                const endIndex = (page+1)*perPage
+                const getResult = jsw.getRxLines(id, startIndex, endIndex)
+                const pageInfo = {
+                    hasPreviousPage: 0 < startIndex,
+                    hasNextPage: endIndex < getResult.total
+                }
+                return Promise.resolve({...getResult, pageInfo})
             } else {
                 return Promise.resolve({data:[{id:0}], total:1} as GetListResult)
             }
@@ -52,7 +46,7 @@ const webSerialProvider = (jsw:JsSerialWeb): DataProvider => {
 
         getOne: (resource, params) =>{
             const ps = jsw.getPorts()
-            const port = ps.curr.filter((port)=>port.id === params.id)[0]
+            const port = ps.curr.filter((port)=>port.id === parseInt(params.id.toString(10), 10))[0]
             return Promise.resolve({data:buildPortRecord(port)} as GetOneResult)
         },
 
@@ -71,14 +65,12 @@ const webSerialProvider = (jsw:JsSerialWeb): DataProvider => {
         create: (resource, params) => {
             return jsw.promptGrantAccess()
             .then((port)=>{
-                console.log()
                 return { data: buildPortRecord(port)} as CreateResult
             })
         },
 
         delete: (resource, params) => {
-            const id = parseInt(params.id.toString(10))
-            console.log(id)
+            const id = parseInt(params.id.toString(10), 10)
             return jsw.deletePort(id)
             .then((port)=>{
                 return {data:buildPortRecord(port)} as DeleteResult
