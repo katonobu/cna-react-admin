@@ -1,14 +1,14 @@
 import { useContext } from 'react'
 import { useGetRecordId, useRecordContext } from 'react-admin'
 
-import { JsSerialWebContext } from '@/app/AppRoot'
+import { JsSerialBleWebContext } from '@/app/AppRoot'
 import { useIsOpen } from '@/app/webSerialDataProvider/src/useJsSerialWeb'
 
 // 画面右側の表示
 const Aside = () => {
     const id = parseInt(useGetRecordId().toString(10), 10)
     const record = useRecordContext();
-    const jsw = useContext(JsSerialWebContext)
+    const jsw = useContext(JsSerialBleWebContext)
     const isOpen = useIsOpen(jsw, id)
     if(record && 'venderName' in record && 'isOpen' in record){
         return (

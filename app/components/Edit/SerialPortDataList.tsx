@@ -3,12 +3,12 @@ import { useInfiniteGetList } from 'react-admin';
 import { List, ListItem, ListItemText } from '@mui/material';
 import { Typography, useMediaQuery } from '@mui/material';
 import { useQueryClient } from 'react-query'
-import {JsSerialWebContext} from '@/app/AppRoot'
+import {JsSerialBleWebContext} from '@/app/AppRoot'
 import { useRxBufferLen } from '@/app/webSerialDataProvider/src/useJsSerialWeb'
 
 const InvalidateIfDataUpdated = ({fetchInfo}:any) => {
     const {total, hasNextPage, portIdStr} = fetchInfo
-    const jsw = useContext(JsSerialWebContext)    
+    const jsw = useContext(JsSerialBleWebContext)    
     const rxBuffLen = useRxBufferLen(jsw, parseInt(portIdStr, 10))
 //    console.log(rxBuffLen)
     const totalLines = rxBuffLen.totalLines

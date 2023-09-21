@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@katonobu/js-serial-web": "^0.0.2",
+    "@katonobu/js-ble-web": "0.0.1",
     "@types/node": "20.3.2",
     "@types/react": "18.2.14",
     "@types/react-dom": "18.2.6",

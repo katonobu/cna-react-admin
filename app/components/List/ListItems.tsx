@@ -1,10 +1,10 @@
 import { Datagrid, TextField, SimpleList, BulkDeleteButton, FunctionField} from 'react-admin';
 import { useMediaQuery } from '@mui/material';
-import JsSerialWeb from '@katonobu/js-serial-web';
+import JsSerialBleWeb from '@katonobu/js-ble-web';
 import { portRecordType } from '@/app/webSerialDataProvider/src/index'
 
 
-const getStatusStr = (jsw:JsSerialWeb, record:portRecordType)=>{
+const getStatusStr = (jsw:JsSerialBleWeb, record:portRecordType)=>{
     if (!record) return "";
     const id = parseInt(record.id.toString(10), 10)
     const isOpen = jsw.getOpenStt(id)
@@ -23,7 +23,7 @@ const getStatusStr = (jsw:JsSerialWeb, record:portRecordType)=>{
 }
 
 // バルク選択 enable/disable制御は https://marmelab.com/react-admin/Datagrid.html#isrowselectable より引用
-const ListItems = ({jsw}:{jsw:JsSerialWeb})=>{
+const ListItems = ({jsw}:{jsw:JsSerialBleWeb})=>{
     const isSmall = useMediaQuery((theme:any) => theme.breakpoints.down('sm'))
     if (isSmall) {
         return <SimpleList

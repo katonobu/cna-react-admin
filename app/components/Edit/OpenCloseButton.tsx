@@ -5,13 +5,13 @@ import { useMediaQuery, Button } from '@mui/material';
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import CloseFullscreenIcon from '@mui/icons-material/CloseFullscreen';
 
-import JsSerialWeb from '@katonobu/js-serial-web';
+import JsSerialBleWeb from '@katonobu/js-ble-web';
 import { portRecordType } from '@/app/webSerialDataProvider/src/index'
 import { useOpen, useClose, useReceieveStart, useIsOpen } from '@/app/webSerialDataProvider/src/useJsSerialWeb'
 
 // https://github.com/marmelab/react-admin/blob/master/packages/ra-ui-materialui/src/button/ListButton.tsx
 // によれば、単にButtonの子要素にアイコンを指定しているだけ
-const OpenCloseButton = ({id, jsw}:{id:number, jsw:JsSerialWeb})=> {
+const OpenCloseButton = ({id, jsw}:{id:number, jsw:JsSerialBleWeb})=> {
     const open = useOpen(jsw, id)
     const close = useClose(jsw, id)
     const receiveStart = useReceieveStart(jsw, id)

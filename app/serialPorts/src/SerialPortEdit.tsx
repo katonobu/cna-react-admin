@@ -5,7 +5,7 @@ import { useGetRecordId, useRecordContext } from 'react-admin'
 
 import { useMediaQuery } from '@mui/material';
 
-import { JsSerialWebContext } from '@/app/AppRoot'
+import { JsSerialBleWebContext } from '@/app/AppRoot'
 import { SerialPortsDataList} from '@/app/components/Edit/SerialPortDataList'
 import Aside from '@/app/components/Edit/Aside'
 import OpenCloseButton from '@/app/components/Edit/OpenCloseButton'
@@ -15,7 +15,7 @@ import PortDeleteButton from '@/app/components/Edit/PortDeleteButton'
 // 画面右上のボタン群の設定
 const Actions = () => {
     const id = parseInt(useGetRecordId().toString(10), 10)
-    const jsw = useContext(JsSerialWebContext)
+    const jsw = useContext(JsSerialBleWebContext)
 
     return <TopToolbar>
         <div style={{ marginRight: 'auto' }}>

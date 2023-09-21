@@ -1,6 +1,6 @@
 import { DataProvider } from 'ra-core';
 import { CreateResult, DeleteResult, DeleteManyResult, GetListResult, GetOneResult } from 'react-admin';
-import JsSerialWeb from '@katonobu/js-serial-web';
+import JsSerialBleWeb from '@katonobu/js-ble-web';
 
 export type portRecordType = {
     id:number;
@@ -12,13 +12,12 @@ export type portRecordType = {
 
 const buildPortRecord = (port:any) => ({
     id:port.id,
-    pid:'0x'+port.pid.toString(16).padStart(4,'0'),
-    vid:'0x'+port.vid.toString(16).padStart(4,'0'),
+    name:port.name,
     available:port.available?'TRUE':'FALSE',
     reason:port.reason
 })
 
-const webSerialProvider = (jsw:JsSerialWeb): DataProvider => {
+const webSerialProvider = (jsw:JsSerialBleWeb): DataProvider => {
     console.log("webSerialProvider init.")
     jsw.init()
     return {

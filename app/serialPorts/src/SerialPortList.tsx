@@ -1,7 +1,7 @@
 import { useEffect, useContext } from 'react'
 import { List, TopToolbar } from 'react-admin';
 import { useRefresh } from 'react-admin';
-import { JsSerialWebContext } from '@/app/AppRoot'
+import { JsSerialBleWebContext } from '@/app/AppRoot'
 import { useSerialPorts } from '@/app/webSerialDataProvider/src/useJsSerialWeb'
 import SelectAddButton  from '@/app/components/List/SelectAddButton';
 import Empty from '@/app/components/List/Empty'
@@ -15,7 +15,7 @@ const ListActions = () => (
 )
 
 export const SerialPortsList = () => {
-    const jsw = useContext(JsSerialWebContext)
+    const jsw = useContext(JsSerialBleWebContext)
     const serialPorts = useSerialPorts(jsw)
     const refresh = useRefresh()
     useEffect(()=>{
