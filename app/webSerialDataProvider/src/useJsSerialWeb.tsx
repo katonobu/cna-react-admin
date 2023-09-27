@@ -36,7 +36,7 @@ export const useRxBufferLen = (jsw:JsSerialWeb, id:number) => {
 }
 
 export const useOpen       = (jsw:JsSerialWeb, id:number)=>useMemo(()=> {
-    return (options:SerialOptions)=>jsw.openPort(id, options)
+    return (options:SerialOptions)=>jsw.openPort(id, {serialOpenOptions:options})
 },[id, jsw])
 
 export const useClose       = (jsw:JsSerialWeb, id:number)=>useMemo(()=> {

@@ -27,7 +27,7 @@ const makeIcon = (port:portDataType)=>{
 const MyMenu = () => {
   const [portsInfo, setPortsInfo] = useState([baseResource])
   const jsw = useContext(JsSerialWebContext)
-  const serialPorts:portDataType[] = useSerialPorts(jsw)
+  const serialPorts:any[] = useSerialPorts(jsw)
   // SerialPortIcon　固定値で色指定しているのがイケてない。。。
   useEffect(() => {
     const devices = serialPorts.map((port)=>{
